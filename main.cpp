@@ -19,6 +19,7 @@ int main() {
           //imprime texto na tela na coordenada do mouse
           textout(screen, font, "botao esquerdo do mouse", mouse_x, mouse_y, makecol(255,0,0) );
         }
+        //se apertar o botão direito do mouse
 		if (mouse_b & 2){
           textout(screen, font, "botao direito do mouse", mouse_x, mouse_y, makecol(0,0,255 ) );
        }
@@ -42,6 +43,7 @@ void init() {
 		exit(-1);
 	}
 
+    //instala o timer, teclado e mouse
 	install_timer();
 	install_keyboard();
 	install_mouse();
