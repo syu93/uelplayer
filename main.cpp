@@ -11,10 +11,10 @@ int main() {
 	init();
 	// inicia o áudio com 10 canais
 	FSOUND_Init (44100, 10, 0);
-	
-    // esc para sair do programa	
+
+    // esc para sair do programa
     while (!key[KEY_ESC]) {
-        //se apertar o botão esquerdo do mouse  
+        //se apertar o botão esquerdo do mouse
         if (mouse_b & 1){
           //imprime texto na tela na coordenada do mouse
           textout(screen, font, "botao esquerdo do mouse", mouse_x, mouse_y, makecol(255,0,0) );
@@ -34,9 +34,11 @@ END_OF_MAIN()
 void init() {
 	int depth, res;
 	allegro_init();
+	//seleção da profundidade das cores (em bits)
 	depth = desktop_color_depth();
 	if (depth == 0) depth = 32;
 	set_color_depth(depth);
+	//seleção da resolução com janela
 	res = set_gfx_mode(GFX_AUTODETECT_WINDOWED, 640, 480, 0, 0);
 	if (res != 0) {
 		allegro_message(allegro_error);
