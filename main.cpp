@@ -18,6 +18,7 @@ int main() {
     //ativa o mouse
     enable_hardware_cursor();
     select_mouse_cursor(MOUSE_CURSOR_ARROW);
+    show_mouse(screen);
     
     //desenha um retângulo azul
     rect(tela, 1,1,640,50, makecol(0,0,170));
@@ -40,22 +41,35 @@ int main() {
     triangle(tela, 320,440, 332,445, 320,450, makecol(250,250,250));
     
     //outros círculos
-    circle(tela, 123,448,18, makecol(0,100,250) );
-    circlefill(tela, 123,448,18,makecol(0,100,250) );
-    circle(tela, 120,445,15, makecol(0,70,150) );
-    circlefill(tela, 120,445,15,makecol(0,70,150) );
-    circle(tela, 223,448,18, makecol(0,100,250) );
-    circlefill(tela, 223,448,18,makecol(0,100,250) );
-    circle(tela, 220,445,15, makecol(0,70,150) );
-    circlefill(tela, 220,445,15,makecol(0,70,150) );
-    circle(tela, 423,448,18, makecol(0,100,250) );
-    circlefill(tela, 423,448,18,makecol(0,100,250) );
-    circle(tela, 420,445,15, makecol(0,70,150) );
-    circlefill(tela, 420,445,15,makecol(0,70,150) );
-    circle(tela, 523,448,18, makecol(0,100,250) );
-    circlefill(tela, 523,448,18,makecol(0,100,250) );
-    circle(tela, 520,445,15, makecol(0,70,150) );
-    circlefill(tela, 520,445,15,makecol(0,70,150) );
+    circle(tela, 123,448,18, makecol(0,100,250));
+    circlefill(tela, 123,448,18,makecol(0,100,250));
+    circle(tela, 120,445,15, makecol(0,70,150));
+    circlefill(tela, 120,445,15,makecol(0,70,150));
+    
+    //stop
+    circle(tela, 223,448,18, makecol(0,100,250));
+    circlefill(tela, 223,448,18,makecol(0,100,250));
+    circle(tela, 220,445,15, makecol(0,70,150));
+    circlefill(tela, 220,445,15,makecol(0,70,150));
+    rect(tela, 220,440,225,450, makecol(250,250,250));
+    rectfill(tela, 221,441,224,449, makecol(250,250,250));
+    
+    //backward
+    circle(tela, 423,448,18, makecol(0,100,250));
+    circlefill(tela, 423,448,18,makecol(0,100,250));
+    circle(tela, 420,445,15, makecol(0,70,150));
+    circlefill(tela, 420,445,15,makecol(0,70,150));
+    triangle(tela, 320,440, 332,445, 320,450, makecol(250,250,250));
+    triangle(tela, 422,440, 410,445, 422,450, makecol(250,250,250));
+    triangle(tela, 432,440, 420,445, 432,450, makecol(250,250,250));
+    
+    //foreword
+    circle(tela, 523,448,18, makecol(0,100,250));
+    circlefill(tela, 523,448,18,makecol(0,100,250));
+    circle(tela, 520,445,15, makecol(0,70,150));
+    circlefill(tela, 520,445,15,makecol(0,70,150));
+    triangle(tela, 510,440, 522,445, 510,450, makecol(250,250,250));
+    triangle(tela, 520,440, 532,445, 520,450, makecol(250,250,250));
     
     // esc para sair do programa
     while (! key[KEY_ESC]) {
@@ -68,12 +82,10 @@ int main() {
 		if (mouse_b & 2){
            textout_ex(screen, font, "botao direito do mouse", mouse_x, mouse_y, makecol(0,0,255),-1);
        } 
-       show_mouse(screen);
        //recurso para evitar o "pisca-pisca" da tela, copiando tela em screen
-       textout_ex(tela, font, "UEL PLAYER", 260, 5, makecol(200,200,200),-1);
+       textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(200,200,200),-1);
        blit(tela, screen, 0, 0, 0, 0, 640, 480);
   }
-
 	deinit();
 	return 0;
 }
