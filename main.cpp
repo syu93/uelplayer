@@ -31,11 +31,13 @@ int main() {
     rect(tela, 1,471,640,480, makecol(120,120,120));
     rectfill(tela, 2,472,639,479, makecol(120,120,120));
     
-    //desenha um círculo azul de raio 23
+    
+    //desenha um círculo azul de raio 23 (botão play)
     circle(tela, 323,448,23, makecol(0,100,250) );
     circlefill(tela, 323,448,23,makecol(0,100,250) );
     circle(tela, 320,445,20, makecol(0,70,150) );
     circlefill(tela, 320,445,20,makecol(0,70,150) );
+    triangle(tela, 320,440, 332,445, 320,450, makecol(250,250,250));
     
     //outros círculos
     circle(tela, 123,448,18, makecol(0,100,250) );
@@ -60,15 +62,15 @@ int main() {
         //se apertar o botão esquerdo do mouse
         if (mouse_b & 1){
           //imprime texto na tela na coordenada do mouse
-          textout(screen, font, "botao esquerdo do mouse", mouse_x, mouse_y, makecol(255,0,0) );
+          textout_ex(screen, font, "botao esquerdo do mouse", mouse_x, mouse_y, makecol(255,0,0),-1);
         } 
         //se apertar o botão direito do mouse
 		if (mouse_b & 2){
-           textout(screen, font, "botao direito do mouse", mouse_x, mouse_y, makecol(0,0,255 ) );
+           textout_ex(screen, font, "botao direito do mouse", mouse_x, mouse_y, makecol(0,0,255),-1);
        } 
        show_mouse(screen);
        //recurso para evitar o "pisca-pisca" da tela, copiando tela em screen
-       textout(tela, font, "UEL PLAYER", 260, 5, makecol(200,200,200) );
+       textout_ex(tela, font, "UEL PLAYER", 260, 5, makecol(200,200,200),-1);
        blit(tela, screen, 0, 0, 0, 0, 640, 480);
   }
 
