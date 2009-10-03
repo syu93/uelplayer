@@ -12,17 +12,27 @@ int main() {
 	// inicia o áudio com 10 canais
 	FSOUND_Init (44100, 10, 0);
 
+    BITMAP *tela;
+    tela = create_bitmap(640, 480);
+    //ativa o mouse
+    enable_hardware_cursor();
+    select_mouse_cursor(MOUSE_CURSOR_ARROW);
+    
     // esc para sair do programa
-    while (!key[KEY_ESC]) {
+    while (! key[KEY_ESC]) {
         //se apertar o botão esquerdo do mouse
         if (mouse_b & 1){
           //imprime texto na tela na coordenada do mouse
           textout(screen, font, "botao esquerdo do mouse", mouse_x, mouse_y, makecol(255,0,0) );
-        }
+        } 
         //se apertar o botão direito do mouse
 		if (mouse_b & 2){
-          textout(screen, font, "botao direito do mouse", mouse_x, mouse_y, makecol(0,0,255 ) );
-       }
+           textout(screen, font, "botao direito do mouse", mouse_x, mouse_y, makecol(0,0,255 ) );
+       } 
+       show_mouse(screen);
+       //recurso para evitar o "pisca-pisca" da tela
+       blit(tela, screen, 0, 0, 0, 0, 640, 480);
+              
   }
 
 	deinit();
