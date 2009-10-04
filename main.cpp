@@ -6,6 +6,8 @@
 #define FWARD_Y 448
 #define BWARD_X 423
 #define BWARD_Y 448
+#define MAX_X 640
+#define MAX_Y 480
 
 // biblioteca para gráficos, mouse e teclado
 #include <allegro.h>
@@ -37,14 +39,14 @@ int main() {
     
     //inicialização das variávies
     play = false;
-    tela = create_bitmap(640, 480);
+    tela = create_bitmap(MAX_X, MAX_Y);
 
     musica = FSOUND_Stream_Open("arquivo.mp3", 0, 0, 0);
     FSOUND_SetVolume(0, 200);
     
     //desenha um retângulo azul
-    rectfill(tela, 1,1,640,50, makecol(20,70,180));
-    rectfill(tela, 1,51,640,60, makecol(0,50,160));
+    rectfill(tela, 1, 1, 640, 50, makecol(20,70,180));
+    rectfill(tela, 1, 51, 640, 60, makecol(0,50,160));
 
     //desenha um retângulo prata
     rectfill(tela, 1, 421, 640, 470, makecol(150,150,150));
@@ -126,7 +128,7 @@ void init() {
 	set_color_depth(depth);
 
     //seleção da resolução com janela
-	res = set_gfx_mode(GFX_AUTODETECT_WINDOWED, 640, 480, 0, 0);
+	res = set_gfx_mode(GFX_AUTODETECT_WINDOWED, MAX_X, MAX_Y, 0, 0);
 	if (res != 0) {
 		allegro_message(allegro_error);
 		exit(-1);
