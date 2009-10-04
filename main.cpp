@@ -87,7 +87,7 @@ int main() {
             //stop
             } else if ((distponto(mouse_x, mouse_y, 223, 448)) <= 18){
                  FSOUND_Stream_Stop(musica);
-                 playpause(tela, play, musica);
+                 play = playpause(tela, play, musica);
                  FSOUND_SetPaused(0, false);
             }
         }
@@ -150,7 +150,7 @@ float distponto(int x1, int y1, int x2, int y2){
 bool playpause(BITMAP *tela, bool play, FSOUND_STREAM *musica){
     circlefill(tela, 323, 448, 23, makecol(20,70,180));
     circlefill(tela, 320, 445, 20, makecol(0,50,160));
-    if(play){
+    if(!play){
              rectfill(tela, 318, 440, 321, 455, makecol(255,255,255));
              rectfill(tela, 325, 440, 328, 455, makecol(255,255,255));
              //despausa se necessário
