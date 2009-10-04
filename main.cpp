@@ -1,10 +1,10 @@
 #define PLAY_X  323
 #define PLAY_Y  448
-#define STOP_X  223
+#define STOP_X  203
 #define STOP_Y  448
-#define FWARD_X 523
+#define FWARD_X 373
 #define FWARD_Y 448
-#define BWARD_X 423
+#define BWARD_X 273
 #define BWARD_Y 448
 #define MAX_X 640
 #define MAX_Y 480
@@ -28,8 +28,8 @@ volatile int close_button_pressed = false;
 int main() {
 	init();
 	
-	 // inicia o áudio com 10 canais
-	FSOUND_Init (44100, 10, 0);
+    // inicia o áudio com 10 canais
+	FSOUND_Init(44100, 10, 0);
     //cria um bitmap para representar a tela
     BITMAP *tela;
     //ponteiro para música
@@ -52,7 +52,7 @@ int main() {
     rectfill(tela, 1, 421, 640, 470, makecol(150,150,150));
     rectfill(tela, 1, 471, 640, 480, makecol(130,130,130));
 
-    //botão play
+    //botão play (323, 448)
     circlefill(tela, PLAY_X, PLAY_Y, 23, makecol(20,70,180));
     circlefill(tela, PLAY_X-3, PLAY_Y-3, 20, makecol(0,50,160));
     triangle(tela, 320, 440, 332, 445, 320, 450, makecol(255,255,255));
@@ -61,22 +61,22 @@ int main() {
     circlefill(tela, 123, 448, 18, makecol(20,70,180));
     circlefill(tela, 120, 445, 15, makecol(0,50,160));
 
-    //stop (223, 448)
+    //stop (203, 448)
     circlefill(tela, STOP_X, STOP_Y,18,makecol(20,70,180));
     circlefill(tela, STOP_X-3, STOP_Y-3, 15, makecol(0,50,160));
-    rectfill(tela, 220, 440, 225, 450, makecol(255,255,255));
+    rectfill(tela, STOP_X-4, 440, STOP_X+4, 450, makecol(255,255,255));
 
-    //backward (423,448)
+    //backward (273,448)
     circlefill(tela, BWARD_X, BWARD_Y, 18, makecol(20,70,180));
     circlefill(tela, BWARD_X-3, BWARD_Y-3, 15, makecol(0,50,160));
-    triangle(tela, 422, 440, 410, 445, 422, 450, makecol(255,255,255));
-    triangle(tela, 432, 440, 420, 445, 432, 450, makecol(255,255,255));
+    triangle(tela, BWARD_X, 440, BWARD_X-10, 445, BWARD_X, 450, makecol(255,255,255));
+    triangle(tela, BWARD_X+10, 440, BWARD_X, 445, BWARD_X+10, 450, makecol(255,255,255));
 
-    //foreward (523, 448)
+    //foreward (373, 448)
     circlefill(tela, FWARD_X, FWARD_Y, 18, makecol(20,70,180));
     circlefill(tela, FWARD_X-3, FWARD_Y-3, 15, makecol(0,50,160));
-    triangle(tela, 510, 440, 522, 445, 510, 450, makecol(255,255,255));
-    triangle(tela, 520, 440, 532, 445, 520, 450, makecol(255,255,255));
+    triangle(tela, FWARD_X, 440, FWARD_X+10, 445, FWARD_X, 450, makecol(255,255,255));
+    triangle(tela, FWARD_X-10, 440, FWARD_X, 445, FWARD_X-10, 450, makecol(255,255,255));
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(200,200,200),-1);
     textout_ex(tela, font, "F1 para AJUDA", 270, 150, makecol(200,200,200),-1);
@@ -93,10 +93,10 @@ int main() {
         //se apertar o botão esquerdo do mouse
         if (mouse_b & 1){
             //play/pause
-            if((distponto(mouse_x, mouse_y, 323, 448)) <= 25){
+            if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
                play = playpause(tela, play, musica);
             //stop
-            } else if ((distponto(mouse_x, mouse_y, 223, 448)) <= 18){
+            } else if ((distponto(mouse_x, mouse_y, STOP_X, STOP_Y)) <= 18){
                  FSOUND_Stream_Stop(musica);
                  play = true;
                  play = playpause(tela, play, musica);
@@ -107,8 +107,10 @@ int main() {
 		if (mouse_b & 2){
             textout_ex(screen, font, "botao direito do mouse", mouse_x, mouse_y, makecol(0,0,255),-1);
         }
+        //descansa 1 milisegundo para não usar muito cpu
+        rest(1);
   }
-	deinit();
+  	deinit();
 	return 0;
 }
 END_OF_MAIN()
