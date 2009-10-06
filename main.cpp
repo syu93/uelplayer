@@ -1,3 +1,8 @@
+//resolução
+#define MAX_X   640
+#define MAX_Y   480
+
+//botões
 #define PLAY_X  323
 #define PLAY_Y  448
 #define STOP_X  203
@@ -6,8 +11,14 @@
 #define FWARD_Y 448
 #define BWARD_X 273
 #define BWARD_Y 448
-#define MAX_X 640
-#define MAX_Y 480
+
+//volume
+#define VOL_X1  630
+#define VOL_X2  630
+#define VOL_X3  530
+#define VOL_Y1  430
+#define VOL_Y2  460
+#define VOL_Y3  460
 
 // biblioteca para gráficos, mouse e teclado
 #include <allegro.h>
@@ -23,6 +34,7 @@ float distponto(int x1, int y1, int x2, int y2);
 void close_button_handle();
 bool playpause(BITMAP *tela, bool play, FSOUND_STREAM *musica);
 
+//variável para ativar o botão close
 volatile int close_button_pressed = false;
 
 int main() {
@@ -30,19 +42,24 @@ int main() {
 	
     // inicia o áudio com 10 canais
 	FSOUND_Init(44100, 10, 0);
+	
     //cria um bitmap para representar a tela
     BITMAP *tela;
+    
     //ponteiro para música
     FSOUND_STREAM *musica;
 
+    //indica se a música está tocando
     bool play;
     
     //inicialização das variávies
     play = false;
     tela = create_bitmap(MAX_X, MAX_Y);
 
+    //abre o arquivo de aúdio
     musica = FSOUND_Stream_Open("arquivo.mp3", 0, 0, 0);
-    FSOUND_SetVolume(0, 200);
+    //configura o volume
+    FSOUND_SetVolume(0, 125);
     
     //desenha um retângulo azul
     rectfill(tela, 1, 1, 640, 50, makecol(20,70,180));
@@ -52,7 +69,7 @@ int main() {
     rectfill(tela, 1, 421, 640, 470, makecol(150,150,150));
     rectfill(tela, 1, 471, 640, 480, makecol(130,130,130));
 
-    //botão play (323, 448)
+    //botão play 
     circlefill(tela, PLAY_X, PLAY_Y, 23, makecol(20,70,180));
     circlefill(tela, PLAY_X-3, PLAY_Y-3, 20, makecol(0,50,160));
     triangle(tela, 320, 440, 332, 445, 320, 450, makecol(255,255,255));
@@ -61,22 +78,25 @@ int main() {
     circlefill(tela, 123, 448, 18, makecol(20,70,180));
     circlefill(tela, 120, 445, 15, makecol(0,50,160));
 
-    //stop (203, 448)
+    //stop 
     circlefill(tela, STOP_X, STOP_Y,18,makecol(20,70,180));
     circlefill(tela, STOP_X-3, STOP_Y-3, 15, makecol(0,50,160));
     rectfill(tela, STOP_X-4, 440, STOP_X+4, 450, makecol(255,255,255));
 
-    //backward (273,448)
+    //backward 
     circlefill(tela, BWARD_X, BWARD_Y, 18, makecol(20,70,180));
     circlefill(tela, BWARD_X-3, BWARD_Y-3, 15, makecol(0,50,160));
     triangle(tela, BWARD_X, 440, BWARD_X-10, 445, BWARD_X, 450, makecol(255,255,255));
     triangle(tela, BWARD_X+10, 440, BWARD_X, 445, BWARD_X+10, 450, makecol(255,255,255));
 
-    //foreward (373, 448)
+    //forward 
     circlefill(tela, FWARD_X, FWARD_Y, 18, makecol(20,70,180));
     circlefill(tela, FWARD_X-3, FWARD_Y-3, 15, makecol(0,50,160));
     triangle(tela, FWARD_X, 440, FWARD_X+10, 445, FWARD_X, 450, makecol(255,255,255));
     triangle(tela, FWARD_X-10, 440, FWARD_X, 445, FWARD_X-10, 450, makecol(255,255,255));
+    
+    //volume
+    triangle(tela, VOL_X1, VOL_Y1, VOL_X2, VOL_Y2, VOL_X3, VOL_Y3, makecol(0,50,160));
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(200,200,200),-1);
     textout_ex(tela, font, "F1 para AJUDA", 270, 150, makecol(200,200,200),-1);
@@ -105,8 +125,10 @@ int main() {
         }
         //se apertar o botão direito do mouse
 		if (mouse_b & 2){
-            textout_ex(screen, font, "botao direito do mouse", mouse_x, mouse_y, makecol(0,0,255),-1);
+            textout_ex(screen, font, "Propriedades", mouse_x, mouse_y, makecol(0,0,255),-1);
         }
+        //atualiza a tela 
+        blit(tela, screen, 0, 0, 0, 0, 640, 480);
         //descansa 1 milisegundo para não usar muito cpu
         rest(1);
   }
