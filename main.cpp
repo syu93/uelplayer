@@ -46,15 +46,13 @@ int main() {
 	
     //cria um bitmap para representar a tela
     BITMAP *tela;
-    float a;
-    
+        
     //ponteiro para música
     FSOUND_STREAM *musica;
 
     //inicialização das variávies
     tela = create_bitmap(MAX_X, MAX_Y);
-    a = (VOL_Y2-VOL_Y1)/(VOL_X2-VOL_X1);
-
+    
     //abre o arquivo de aúdio
     musica = FSOUND_Stream_Open("arquivo.mp3", 0, 0, 0);
     
@@ -144,20 +142,21 @@ int main() {
         } else {
              if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
                  if(FSOUND_GetPaused(0)){
-                       textout_ex(screen, font, "Play", mouse_x, mouse_y, makecol(255,255,255),0);  
+                       textout_ex(screen, font, "Play", mouse_x, mouse_y-8, makecol(255,255,255),0);  
                  } else {
-                       textout_ex(screen, font, "Pause", mouse_x, mouse_y, makecol(255,255,255),0);  
+                       textout_ex(screen, font, "Pause", mouse_x, mouse_y-8, makecol(255,255,255),0);  
                  }     
              } else if ((distponto(mouse_x, mouse_y, STOP_X, STOP_Y)) <= 18){
-                 textout_ex(screen, font, "Stop", mouse_x, mouse_y, makecol(255,255,255),0);  
+                 textout_ex(screen, font, "Stop", mouse_x, mouse_y-8, makecol(255,255,255),0);  
              } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
-                 textout_ex(screen, font, "Mute", mouse_x, mouse_y, makecol(255,255,255),0);  
+                 textout_ex(screen, font, "Mute", mouse_x, mouse_y-8, makecol(255,255,255),0);  
              } else if (mouse_y <= VOL_Y2 && mouse_y >= VOL_Y1 && mouse_x <= VOL_X2 && mouse_x >= VOL_X1){
-                 if ((mouse_y-VOL_Y1) >= a*(mouse_x-VOL_X2)){
+                 if ((VOL_Y2-mouse_y) <= (mouse_x-VOL_X1)/4){
                     FSOUND_SetVolume(0, int((mouse_x-VOL_X1) * 2.55));
                     triangle(tela, VOL_X2, VOL_Y1, VOL_X1, VOL_Y2, VOL_X2, VOL_Y2, makecol(255,255,255));
                     triangle(tela, mouse_x, VOL_Y2-(mouse_x-VOL_X1)/4, VOL_X1, VOL_Y2, mouse_x, VOL_Y2, makecol(0,50,160));
-                 }
+                    textprintf_ex(screen, font, mouse_x, mouse_y-8, makecol(255,255,255),0, "%d",mouse_x-VOL_X1);  
+                }
              }
         }
         //atualiza a tela 
