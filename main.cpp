@@ -11,14 +11,14 @@
 #define FWARD_Y 448
 #define BWARD_X 273
 #define BWARD_Y 448
+#define MUTE_X 503
+#define MUTE_Y 448
 
 //volume
-#define VOL_X1  630
+#define VOL_X1  530
 #define VOL_X2  630
-#define VOL_X3  530
-#define VOL_Y1  430
+#define VOL_Y1  435
 #define VOL_Y2  460
-#define VOL_Y3  460
 
 // biblioteca para gráficos, mouse e teclado
 #include <allegro.h>
@@ -26,13 +26,14 @@
 // API de áudio
 #include "fmod.h"
 
+// biblioteca para operações matemáticas
 #include<math.h>
 
 void init();
 void deinit();
 float distponto(int x1, int y1, int x2, int y2);
 void close_button_handle();
-bool playpause(BITMAP *tela, bool play, FSOUND_STREAM *musica);
+bool playpause(BITMAP *tela, FSOUND_STREAM *musica);
 
 //variável para ativar o botão close
 volatile int close_button_pressed = false;
@@ -45,22 +46,24 @@ int main() {
 	
     //cria um bitmap para representar a tela
     BITMAP *tela;
+    float a;
     
     //ponteiro para música
     FSOUND_STREAM *musica;
 
-    //indica se a música está tocando
-    bool play;
-    
     //inicialização das variávies
-    play = false;
     tela = create_bitmap(MAX_X, MAX_Y);
+    a = (VOL_Y2-VOL_Y1)/(VOL_X2-VOL_X1);
 
     //abre o arquivo de aúdio
     musica = FSOUND_Stream_Open("arquivo.mp3", 0, 0, 0);
+    
     //configura o volume
     FSOUND_SetVolume(0, 125);
     
+    //configuração inicial: pausada
+    FSOUND_SetPaused(0, true);
+        
     //desenha um retângulo azul
     rectfill(tela, 1, 1, 640, 50, makecol(20,70,180));
     rectfill(tela, 1, 51, 640, 60, makecol(0,50,160));
@@ -95,8 +98,16 @@ int main() {
     triangle(tela, FWARD_X, 440, FWARD_X+10, 445, FWARD_X, 450, makecol(255,255,255));
     triangle(tela, FWARD_X-10, 440, FWARD_X, 445, FWARD_X-10, 450, makecol(255,255,255));
     
+    //mudo
+    circlefill(tela, MUTE_X, MUTE_Y, 15, makecol(20,70,180));
+    circlefill(tela, MUTE_X-3, MUTE_Y-3, 12, makecol(0,50,160));
+    line(tela, MUTE_X-8, MUTE_Y+8, MUTE_X+8, MUTE_Y-8, makecol(255,255,255));
+    line(tela, MUTE_X-7, MUTE_Y+8, MUTE_X+9, MUTE_Y-8, makecol(255,255,255));
+    line(tela, MUTE_X-8, MUTE_Y-8, MUTE_X+8, MUTE_Y+8, makecol(255,255,255));
+    line(tela, MUTE_X-7, MUTE_Y-8, MUTE_X+9, MUTE_Y+8, makecol(255,255,255));
+    
     //volume
-    triangle(tela, VOL_X1, VOL_Y1, VOL_X2, VOL_Y2, VOL_X3, VOL_Y3, makecol(0,50,160));
+    triangle(tela, VOL_X2, VOL_Y1, VOL_X1, VOL_Y2, VOL_X2, VOL_Y2, makecol(0,50,160));
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(200,200,200),-1);
     textout_ex(tela, font, "F1 para AJUDA", 270, 150, makecol(200,200,200),-1);
@@ -114,18 +125,40 @@ int main() {
         if (mouse_b & 1){
             //play/pause
             if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
-               play = playpause(tela, play, musica);
+                 playpause(tela, musica);
             //stop
             } else if ((distponto(mouse_x, mouse_y, STOP_X, STOP_Y)) <= 18){
                  FSOUND_Stream_Stop(musica);
-                 play = true;
-                 play = playpause(tela, play, musica);
                  FSOUND_SetPaused(0, false);
-            }
+                 playpause(tela, musica);
+            //ativa/desativa o modo mudo
+            } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
+                  FSOUND_SetMute(0, !FSOUND_GetMute(0));
+                  rest(100);
+            //ajusta o volume
+            } 
         }
         //se apertar o botão direito do mouse
 		if (mouse_b & 2){
             textout_ex(screen, font, "Propriedades", mouse_x, mouse_y, makecol(0,0,255),-1);
+        } else {
+             if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
+                 if(FSOUND_GetPaused(0)){
+                       textout_ex(screen, font, "Play", mouse_x, mouse_y, makecol(255,255,255),0);  
+                 } else {
+                       textout_ex(screen, font, "Pause", mouse_x, mouse_y, makecol(255,255,255),0);  
+                 }     
+             } else if ((distponto(mouse_x, mouse_y, STOP_X, STOP_Y)) <= 18){
+                 textout_ex(screen, font, "Stop", mouse_x, mouse_y, makecol(255,255,255),0);  
+             } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
+                 textout_ex(screen, font, "Mute", mouse_x, mouse_y, makecol(255,255,255),0);  
+             } else if (mouse_y <= VOL_Y2 && mouse_y >= VOL_Y1 && mouse_x <= VOL_X2 && mouse_x >= VOL_X1){
+                 if ((mouse_y-VOL_Y1) >= a*(mouse_x-VOL_X2)){
+                    FSOUND_SetVolume(0, int((mouse_x-VOL_X1) * 2.55));
+                    triangle(tela, VOL_X2, VOL_Y1, VOL_X1, VOL_Y2, VOL_X2, VOL_Y2, makecol(255,255,255));
+                    triangle(tela, mouse_x, VOL_Y2-(mouse_x-VOL_X1)/4, VOL_X1, VOL_Y2, mouse_x, VOL_Y2, makecol(0,50,160));
+                 }
+             }
         }
         //atualiza a tela 
         blit(tela, screen, 0, 0, 0, 0, 640, 480);
@@ -183,10 +216,11 @@ float distponto(int x1, int y1, int x2, int y2){
 }
 
 //botão play/pause (323, 448)
-bool playpause(BITMAP *tela, bool play, FSOUND_STREAM *musica){
+bool playpause(BITMAP *tela, FSOUND_STREAM *musica){
     circlefill(tela, PLAY_X, PLAY_Y, 23, makecol(20,70,180));
     circlefill(tela, 320, 445, 20, makecol(0,50,160));
-    if(!play){
+    //se não estiver pausado
+    if(FSOUND_GetPaused(0)){
              rectfill(tela, 318, 440, 321, 455, makecol(255,255,255));
              rectfill(tela, 325, 440, 328, 455, makecol(255,255,255));
              //despausa se necessário
@@ -200,8 +234,7 @@ bool playpause(BITMAP *tela, bool play, FSOUND_STREAM *musica){
     }
     blit(tela, screen, 0, 0, 0, 0, 640, 480);
     //aguarda um intervalo para poder pausar/despausar
-    rest(150);
-    return !play;
+    rest(100);
 }
 
 //para ativar o botão fechar

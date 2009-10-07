@@ -1,0 +1,17 @@
+		***	UEL PLAYER	***
+
+
+			INFORMAÇÕES
+	
+
+Estão disponíveis os manuais das API/bibliotecas utilizadas:
+
+*** FMOD (Api de Áudio)***
+FMOD.chm
+
+*** Allegro (Biblioteca para Jogos) ***
+allegro-manual-4.2.1.en.pdf
+
+=============================================================
+
+Aperte F1 para ajuda
