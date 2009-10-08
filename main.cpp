@@ -3,22 +3,24 @@
 #define MAX_Y   480
 
 //botões
-#define PLAY_X  323
-#define PLAY_Y  448
-#define STOP_X  203
-#define STOP_Y  448
-#define FWARD_X 373
-#define FWARD_Y 448
-#define BWARD_X 273
-#define BWARD_Y 448
-#define MUTE_X  603
-#define MUTE_Y  448
+#define REPEAT_X 123
+#define REPEAT_Y 448
+#define PLAY_X   323
+#define PLAY_Y   448
+#define STOP_X   203
+#define STOP_Y   448
+#define FWARD_X  373
+#define FWARD_Y  448
+#define BWARD_X  273
+#define BWARD_Y  448
+#define MUTE_X   603
+#define MUTE_Y   448
 
 //volume
-#define VOL_X1  470
-#define VOL_X2  570
-#define VOL_Y1  435
-#define VOL_Y2  460
+#define VOL_X1   470
+#define VOL_X2   570
+#define VOL_Y1   435
+#define VOL_Y2   460
 
 // biblioteca para gráficos, mouse e teclado
 #include <allegro.h>
@@ -55,6 +57,7 @@ int main() {
 	//variável tipo Player
     Player player;
     
+    //inicializações do allegro
     init();
     
      // inicia o áudio com 10 canais
@@ -80,9 +83,14 @@ int main() {
     circlefill(tela, PLAY_X-3, PLAY_Y-3, 20, makecol(0,50,160));
     triangle(tela, 320, 440, 332, 445, 320, 450, makecol(255,255,255));
     
-    //outros círculos
-    circlefill(tela, 123, 448, 18, makecol(20,70,180));
-    circlefill(tela, 120, 445, 15, makecol(0,50,160));
+    //repeat
+    circlefill(tela, REPEAT_X, REPEAT_Y, 18, makecol(20,70,180));
+    circlefill(tela, REPEAT_X-3, REPEAT_Y-3, 15, makecol(0,50,160));
+    circle(tela, REPEAT_X, REPEAT_Y, 8, makecol(255,255,255));
+    circle(tela, REPEAT_X, REPEAT_Y, 9, makecol(255,255,255));
+    circle(tela, REPEAT_X, REPEAT_Y, 10, makecol(255,255,255));
+    triangle(tela, REPEAT_X+5, 440, REPEAT_X+15, 445, REPEAT_X+5, 450, makecol(255,255,255));
+    
 
     //stop 
     circlefill(tela, STOP_X, STOP_Y,18,makecol(20,70,180));
@@ -115,37 +123,25 @@ int main() {
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(200,200,200),-1);
     
-    textout_ex(tela, font, "Digite o nome da musica.extensao e aperte enter", 260, 20, makecol(200,200,200),-1);
+    textout_ex(tela, font, "Aperte o botao direito do mouse", 230, 20, makecol(200,200,200),-1);
+    textout_ex(tela, font, "Digite musica.extensao", 230, 30, makecol(200,200,200),-1);
+    textout_ex(tela, font, "Aperte enter", 250, 40, makecol(200,200,200),-1);
     
     textout_ex(tela, font, "F1 para AJUDA ", 270, 150, makecol(200,200,200),-1);
     
     blit(tela, screen, 0, 0, 0, 0, 640, 480);
     
-    int i;
-    for(i = 0; i < 100 && !key[KEY_ENTER] && !key[KEY_F1]; i++) {
-            if(!key[KEY_ENTER]){
-                    player.arquivo[i] = char(readkey());
-            }
-    }
-    //finaliza a matriz antes do ultimo caractere
-    player.arquivo[i-1]='\0';
-    
-    //abre o arquivo de aúdio
-    player.musica = FSOUND_Stream_Open(player.arquivo, 0, 0, 0);
-    
-    //configura o volume
-    FSOUND_SetVolume(0, 125);
+    //configura o volume inicial em torno de 50%
+    FSOUND_SetVolume(0, 127);
     
     //configuração inicial: pausada
-    FSOUND_SetPaused(0, true);
+    FSOUND_SetPaused(0, true);  
     
-    
-
     // esc para sair do programa
-    while (! key[KEY_ESC] & ! close_button_pressed) {
+    while (!key[KEY_ESC] && !close_button_pressed) {
         //F1 para ajuda
         if(key[KEY_F1]){
-          textout_ex(tela, font, "AJUDA Digite o nome da musica.mp3 e aperte enter", 270, 80, makecol(200,200,200),-1);
+          textout_ex(tela, font, "AJUDA" , 270, 80, makecol(200,200,200),-1);
           blit(tela, screen, 0, 0, 0, 0, 640, 480);
         }
         //se apertar o botão esquerdo do mouse
@@ -161,7 +157,18 @@ int main() {
             //ativa/desativa o modo mudo
             } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
                   FSOUND_SetMute(0, !FSOUND_GetMute(0));
-                  rest(100);
+                  rest(150);
+            //ativa desativa repeat      
+            } else if ((distponto(mouse_x, mouse_y, REPEAT_X, REPEAT_Y)) <= 18){
+                    if(!((FSOUND_Stream_GetMode(player.musica)) & FSOUND_LOOP_NORMAL)){
+                          FSOUND_Stream_SetMode(player.musica, FSOUND_LOOP_NORMAL);
+                    } else {
+                           FSOUND_Stream_SetMode(player.musica, FSOUND_LOOP_OFF);
+                    }
+                    if(!FSOUND_GetPaused(0)){
+                       player.playpause(tela);
+                       FSOUND_Stream_Stop(player.musica);
+                    }
             //ajusta o volume
             }  else if (mouse_y <= VOL_Y2 && mouse_x <= VOL_X2){
                  if ((VOL_Y2-mouse_y) <= (mouse_x-VOL_X1)/4){
@@ -173,7 +180,28 @@ int main() {
         }
         //se apertar o botão direito do mouse
 		if (mouse_b & 2){
-            textout_ex(screen, font, "Propriedades", mouse_x-8, mouse_y-8, makecol(0,0,255),-1);
+            textout_ex(screen, font, "Digite o nome.extensao", mouse_x-8, mouse_y-8, makecol(255,255,255),-1);
+            int i;
+                        
+            //limpa a string
+            strcpy(player.arquivo, "");
+            
+            //limpa buffer do teclado
+            clear_keybuf();
+            for(i = 0; i < 100 && !key[KEY_ENTER] && !key[KEY_F1] && !key[KEY_ESC]; i++) {
+                 player.arquivo[i] = readkey();
+                 textprintf_ex(screen, font, i*8+1, 300, makecol(255,255,255),0, "%c", player.arquivo[i]);
+            }
+                    
+            //finaliza a matriz antes do ultimo caractere
+            player.arquivo[i-1]='\0';
+            
+            //para a música antiga
+            FSOUND_Stream_Close(player.musica);
+            
+            //abre o arquivo de aúdio do nome inserido
+            player.musica = FSOUND_Stream_Open(player.arquivo, 0, 0, 0);
+            
         //caso passe o mouse por cima de algo
         } else {
              if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
@@ -186,11 +214,14 @@ int main() {
                  textout_ex(screen, font, "Stop", mouse_x-8, mouse_y-8, makecol(255,255,255),0);  
              } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
                  textout_ex(screen, font, "Mute", mouse_x-8, mouse_y-8, makecol(255,255,255),0);  
+             } else if ((distponto(mouse_x, mouse_y, REPEAT_X, REPEAT_Y)) <= 18){
+                    textout_ex(screen, font, "Repeat", mouse_x-8, mouse_y-8, makecol(255,255,255),0);  
              } else if (mouse_y <= VOL_Y2 && mouse_x <= VOL_X2){
                  if ((VOL_Y2-mouse_y) <= (mouse_x-VOL_X1)/4){
                     textprintf_ex(screen, font, mouse_x-20, mouse_y-8, makecol(255,255,255),0, "%Vol %d",mouse_x-VOL_X1);  
                 }
              }
+            
         }
         //atualiza a tela 
         blit(tela, screen, 0, 0, 0, 0, 640, 480);
@@ -253,9 +284,15 @@ void Player::playpause(BITMAP *tela){
     circlefill(tela, 320, 445, 20, makecol(0,50,160));
     //se não estiver pausado
     if(FSOUND_GetPaused(0)){
+             int ms = FSOUND_Stream_GetLengthMs(musica);
              rectfill(tela, 318, 440, 321, 455, makecol(255,255,255));
              rectfill(tela, 325, 440, 328, 455, makecol(255,255,255));
+             rectfill(tela, 1, 381, 640, 410, makecol(20,70,180));
+             rectfill(tela, 1, 411, 640, 420, makecol(0,50,160));
+             //imprime o nome da música
              textprintf_ex(tela, font, 10, 401, makecol(255,255,255),-1, "%s", arquivo);
+             //imprime a duração da música
+             textprintf_ex(tela, font, 500, 401, makecol(255,255,255), -1, "%d : %d", ms/60000, (ms/1000)%60);
              //despausa se necessário
              FSOUND_SetPaused(0, false);
              //toca a música
@@ -267,7 +304,7 @@ void Player::playpause(BITMAP *tela){
     }
     blit(tela, screen, 0, 0, 0, 0, 640, 480);
     //aguarda um intervalo para poder pausar/despausar
-    rest(100);
+    rest(150);
 }
 
 //para ativar o botão fechar
