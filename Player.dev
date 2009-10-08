@@ -1,7 +1,7 @@
 [Project]
 FileName=Player.dev
 Name=Player
-UnitCount=1
+UnitCount=2
 Type=0
 Ver=1
 ObjFiles=
@@ -56,4 +56,14 @@ OriginalFilename=
 ProductName=
 ProductVersion=
 AutoIncBuildNr=0
+
+[Unit2]
+FileName=defines.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
 
