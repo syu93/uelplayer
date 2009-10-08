@@ -49,31 +49,20 @@ void close_button_handle();
 volatile int close_button_pressed = false;
 
 int main() {
-	init();
-	
-    // inicia o áudio com 10 canais
-	FSOUND_Init(44100, 10, 0);
-	
-    //cria um bitmap para representar a tela
+	//cria um bitmap para representar a tela
     BITMAP *tela;
 
 	//variável tipo Player
     Player player;
     
-    strcpy(player.arquivo, "arquivo.mp3");
-        
+    init();
+    
+     // inicia o áudio com 10 canais
+	FSOUND_Init(44100, 10, 0);
+    
     //inicialização das variávies
     tela = create_bitmap(MAX_X, MAX_Y);
     
-    //abre o arquivo de aúdio
-    player.musica = FSOUND_Stream_Open(player.arquivo, 0, 0, 0);
-    
-    //configura o volume
-    FSOUND_SetVolume(0, 125);
-    
-    //configuração inicial: pausada
-    FSOUND_SetPaused(0, true);
-        
     //desenha um retângulo azul em cima
     rectfill(tela, 1, 1, 640, 50, makecol(20,70,180));
     rectfill(tela, 1, 51, 640, 60, makecol(0,50,160));
@@ -125,15 +114,38 @@ int main() {
     triangle(tela, VOL_X2-50, VOL_Y1+12, VOL_X1, VOL_Y2, VOL_X2-50, VOL_Y2, makecol(0,50,160));
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(200,200,200),-1);
-    textout_ex(tela, font, "F1 para AJUDA", 270, 150, makecol(200,200,200),-1);
+    
+    textout_ex(tela, font, "Digite o nome da musica.extensao e aperte enter", 260, 20, makecol(200,200,200),-1);
+    
+    textout_ex(tela, font, "F1 para AJUDA ", 270, 150, makecol(200,200,200),-1);
     
     blit(tela, screen, 0, 0, 0, 0, 640, 480);
+    
+    int i;
+    for(i = 0; i < 100 && !key[KEY_ENTER] && !key[KEY_F1]; i++) {
+            if(!key[KEY_ENTER]){
+                    player.arquivo[i] = char(readkey());
+            }
+    }
+    //finaliza a matriz antes do ultimo caractere
+    player.arquivo[i-1]='\0';
+    
+    //abre o arquivo de aúdio
+    player.musica = FSOUND_Stream_Open(player.arquivo, 0, 0, 0);
+    
+    //configura o volume
+    FSOUND_SetVolume(0, 125);
+    
+    //configuração inicial: pausada
+    FSOUND_SetPaused(0, true);
+    
+    
 
     // esc para sair do programa
     while (! key[KEY_ESC] & ! close_button_pressed) {
         //F1 para ajuda
         if(key[KEY_F1]){
-          textout_ex(tela, font, "AJUDA", 270, 80, makecol(200,200,200),-1);
+          textout_ex(tela, font, "AJUDA Digite o nome da musica.mp3 e aperte enter", 270, 80, makecol(200,200,200),-1);
           blit(tela, screen, 0, 0, 0, 0, 640, 480);
         }
         //se apertar o botão esquerdo do mouse
