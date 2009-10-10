@@ -22,6 +22,9 @@ typedef struct Player{
     
     //arquivo utilizado pelo programa
     FILE *bib;
+    
+    //número da música
+    int num;
         
     //matriz para nome dos arquivos (anterior, atual, próximo)
     char arquivo[3][100];
@@ -34,8 +37,9 @@ typedef struct Player{
     void criarbiblioteca();
     void imprimirbiblioteca();
     void passarmouse();
-    void mousedireito();
+    void inicializar();
     void mouseesquerdo();
+    void backnext(bool next);
 };
 
 void init();
@@ -58,7 +62,7 @@ int main() {
     
     //inicialização das variávies
     player.tela = create_bitmap(MAX_X, MAX_Y);
-    
+        
     //carrega a biblioteca
     player.criarbiblioteca();
     
@@ -67,6 +71,9 @@ int main() {
     
     //exibir a biblioteca
     player.imprimirbiblioteca();
+    
+    //carrega a primeira música
+    player.inicializar();
     
     //configura o volume inicial em torno de 50%
     FSOUND_SetVolume(0, 127);
@@ -87,7 +94,6 @@ int main() {
         }
         //se apertar o botão direito do mouse
 		if (mouse_b & 2){
-            player.mousedireito();
         //caso passe o mouse por cima de algo
         } else {
             player.passarmouse();
@@ -238,10 +244,6 @@ void Player::layout(){
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(255,255,255),-1);
     
-    textout_ex(tela, font, "Aperte o botao direito do mouse", 230, 20, makecol(255,255,255),-1);
-    textout_ex(tela, font, "Digite musica.extensao", 230, 30, makecol(255,255,255),-1);
-    textout_ex(tela, font, "Aperte enter", 250, 40, makecol(255,255,255),-1);
-    
     textout_ex(tela, font, "F1 para AJUDA ", 270, 150, makecol(255,255,255),-1);
     
     blit(tela, screen, 0, 0, 0, 0, 640, 480);     
@@ -262,8 +264,10 @@ void Player::criarbiblioteca(){
         //lê os arquivos dos diretorios
         item_dir = readdir(dir);
         while(item_dir){
-            //escreve os nomes dos arquivos na biblioteca
-            fprintf(bib, "%s\n", item_dir -> d_name );
+            if(item_dir->d_name[0] != '.'){
+                //escreve os nomes dos arquivos na biblioteca
+                fprintf(bib, "%s\n", item_dir -> d_name );
+            }
             item_dir = readdir(dir);
         }
     }
@@ -279,14 +283,14 @@ void Player::imprimirbiblioteca(){
         
     bib = fopen("data\\biblioteca.txt", "r");
     for(i = 1, j = 100; !feof(bib); i += 8){
-        letra = getc(bib);
+        letra = fgetc(bib);
         //escreve uma linha
         if(letra != '\n' && letra != -1){
-            textprintf_ex(tela, font, i, j, makecol(255,255,255), -1, "%c", letra);
+             textprintf_ex(tela, font, i, j, makecol(255,255,255), -1, "%c", letra);
         //pula linha
         } else {
             j += 8;
-            i = 1;
+            i = -7;
         }
     }
 }
@@ -339,6 +343,12 @@ void Player::mouseesquerdo(){
             playpause();
             FSOUND_Stream_Stop(musica);
         }
+    //próxima música    
+    } else if ((distponto(mouse_x, mouse_y, FWARD_X, FWARD_Y)) <= 18){
+        backnext(true);
+    //música anterior
+    } else if ((distponto(mouse_x, mouse_y, BWARD_X, BWARD_Y)) <= 18){
+        backnext(false);
     //ajusta o volume
     } else if (mouse_y <= VOL_Y2 && mouse_x <= VOL_X2){
         if ((VOL_Y2-mouse_y) <= (mouse_x-VOL_X1)/4){
@@ -349,23 +359,75 @@ void Player::mouseesquerdo(){
     }
 }
 
-void Player::mousedireito(){
-    textout_ex(screen, font, "Digite o nome.extensao", mouse_x-8, mouse_y-8, makecol(255,255,255),-1);
-    int i;
+void Player::backnext(bool next){
+    int i, j;
+    char nome[100]; 
                         
     //limpa a string com o nome do diretorio
     strcpy(arquivo[1], "musicas\\\\");
-            
-    //limpa buffer do teclado
-    clear_keybuf();
-    for(i = 9; i < 100 && !key[KEY_ENTER] && !key[KEY_F1] && !key[KEY_ESC]; i++){
-        arquivo[1][i] = readkey();
-        textprintf_ex(screen, font, i*8+1, 300, makecol(255,255,255),0, "%c", arquivo[1][i]);
+    
+    bib = fopen("data\\biblioteca.txt", "r");
+    
+    //avança
+    if(next){
+        num++;
+    //retorna
+    } else {
+        num--;
     }
-            
-    //finaliza a matriz antes do ultimo caractere
-    arquivo[1][i-1]='\0';
-            
+    
+    //abre o arquivo de número num
+    for(i = 0; i < num; i++){
+        for(j = 0; j < 100; j++){ 
+            nome[j] = getc(bib);
+            if (nome[j] == '\n'){
+                nome[j] = '\0';
+                break;
+            }
+        }
+    }
+        
+    //concatena o nome do arquivo
+    strcat(arquivo[1], nome); 
+                    
+    //para a música antiga
+    FSOUND_Stream_Close(musica);
+    
+    //muda o ícone
+    playpause();
+                
+    //abre o arquivo de aúdio do nome inserido
+    musica = FSOUND_Stream_Open(arquivo[1], 0, 0, 0);
+    
+    //toca a música nova
+    playpause();
+}
+
+void Player::inicializar(){
+    int i, j;
+    char nome[100]; 
+                        
+    //limpa a string com o nome do diretorio
+    strcpy(arquivo[1], "musicas\\\\");
+    
+    //toca a primeira música
+    num = 1;
+    
+    bib = fopen("data\\biblioteca.txt", "r");
+    //abre o arquivo de número num
+    for(int i = 0; i < num; i++){
+        for(j = 0; j < 100; j++){ 
+            nome[j] = getc(bib);
+            if (nome[j] == '\n'){
+                nome[j] = '\0';
+                break;
+            }
+        }
+    }
+    
+    //concatena o nome do arquivo
+    strcat(arquivo[1], nome); 
+                    
     //para a música antiga
     FSOUND_Stream_Close(musica);
             
