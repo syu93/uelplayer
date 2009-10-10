@@ -6,6 +6,8 @@
 
 #include<math.h>
 #include<string.h>
+#include<stdio.h>
+#include<dirent.h>
 
 //definições de macros
 #include "defines.cpp"
@@ -15,15 +17,21 @@ typedef struct Player{
     //ponteiro para música
     FSOUND_STREAM *musica;
     
-    //vetor de caracteres para nome do arquivo
-    char arquivo[100];
+    //diretorio utilizado pelo programa
+    DIR *dir;
+    
+    //arquivo utilizado pelo programa
+    FILE *bib;
+        
+    //matriz para nome dos arquivos (anterior, atual, próximo)
+    char arquivo[3][100];
     
     //bitmap para representar a tela
     BITMAP *tela;
     
     void playpause();
-    
     void layout();
+    void biblioteca();
 };
 
 void init();
@@ -47,6 +55,10 @@ int main() {
     //inicialização das variávies
     player.tela = create_bitmap(MAX_X, MAX_Y);
     
+    //carrega a biblioteca
+    player.biblioteca();
+    
+    //desenha o layout da tela
     player.layout();
     
     //configura o volume inicial em torno de 50%
@@ -101,24 +113,24 @@ int main() {
             textout_ex(screen, font, "Digite o nome.extensao", mouse_x-8, mouse_y-8, makecol(255,255,255),-1);
             int i;
                         
-            //limpa a string
-            strcpy(player.arquivo, "");
+            //limpa a string com o nome do diretorio
+            strcpy(player.arquivo[1], "musicas\\\\");
             
             //limpa buffer do teclado
             clear_keybuf();
-            for(i = 0; i < 100 && !key[KEY_ENTER] && !key[KEY_F1] && !key[KEY_ESC]; i++) {
-                 player.arquivo[i] = readkey();
-                 textprintf_ex(screen, font, i*8+1, 300, makecol(255,255,255),0, "%c", player.arquivo[i]);
+            for(i = 9; i < 100 && !key[KEY_ENTER] && !key[KEY_F1] && !key[KEY_ESC]; i++) {
+                 player.arquivo[1][i] = readkey();
+                 textprintf_ex(screen, font, i*8+1, 300, makecol(255,255,255),0, "%c", player.arquivo[1][i]);
             }
-                    
+            
             //finaliza a matriz antes do ultimo caractere
-            player.arquivo[i-1]='\0';
+            player.arquivo[1][i-1]='\0';
             
             //para a música antiga
             FSOUND_Stream_Close(player.musica);
             
             //abre o arquivo de aúdio do nome inserido
-            player.musica = FSOUND_Stream_Open(player.arquivo, 0, 0, 0);
+            player.musica = FSOUND_Stream_Open(player.arquivo[1], 0, 0, 0);
             
         //caso passe o mouse por cima de algo
         } else {
@@ -206,13 +218,14 @@ void Player::playpause(){
     circlefill(tela, 320, 445, 20, makecol(0,50,160));
     //se não estiver pausado
     if(FSOUND_GetPaused(0)){
+             //guarda a duração da música em milisegundos
              int ms = FSOUND_Stream_GetLengthMs(musica);
              rectfill(tela, 318, 440, 321, 455, makecol(255,255,255));
              rectfill(tela, 325, 440, 328, 455, makecol(255,255,255));
              rectfill(tela, 1, 381, 640, 410, makecol(20,70,180));
              rectfill(tela, 1, 411, 640, 420, makecol(0,50,160));
              //imprime o nome da música
-             textprintf_ex(tela, font, 10, 401, makecol(255,255,255),-1, "%s", arquivo);
+             textprintf_ex(tela, font, 10, 401, makecol(255,255,255),-1, "%s", arquivo[1]);
              //imprime a duração da música
              textprintf_ex(tela, font, 500, 401, makecol(255,255,255), -1, "%d : %d", ms/60000, (ms/1000)%60);
              //despausa se necessário
@@ -293,6 +306,32 @@ void Player::layout(){
     textout_ex(tela, font, "F1 para AJUDA ", 270, 150, makecol(255,255,255),-1);
     
     blit(tela, screen, 0, 0, 0, 0, 640, 480);     
+}
+
+void Player::biblioteca(){
+        dirent* item_dir;
+
+        mkdir("data");
+        //cria biblioteca
+        bib = fopen("data\\biblioteca.txt", "w");
+        //aponta para o diretorio de musicas
+        dir = opendir("musicas.");
+        //se houver erro ao abrir diretorio
+        if(!dir) {
+                perror("opendir");
+        } else{
+                //lê os arquivos dos diretorios
+                item_dir = readdir(dir);
+                while(item_dir) {
+                //escreve os nomes dos arquivos na biblioteca
+                fprintf(bib, "%s\n", item_dir -> d_name );
+                item_dir = readdir(dir);
+                }
+        }
+        //fecha o diretório 
+        closedir(dir);
+        //fecha o arquivo
+        fclose(bib);
 }
 
 //para ativar o botão fechar
