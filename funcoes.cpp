@@ -356,6 +356,9 @@ void init() {
 		exit(-1);
 	}
 
+    //funciona sem estar ativo
+    set_display_switch_mode(SWITCH_BACKGROUND);
+    
     //instala o timer, teclado e mouse
 	install_timer();
 	install_keyboard();

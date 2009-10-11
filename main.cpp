@@ -67,8 +67,16 @@ int main() {
             player.passarmouse();
         }
         
+        //descansa 1 milisegundo para não usar muito cpu
+        rest(1);
+        
+        //atualiza a tela 
+        blit(player.tela, screen, 0, 0, 0, 0, 640, 480);
+
+        rest(1);
+        
         //quando acabar a música toca de novo
-        if(!FSOUND_IsPlaying(0) && !FSOUND_GetPaused(0)){
+        if(!FSOUND_GetPaused(0) && !FSOUND_IsPlaying(0)){
             //a mesma música
             if((FSOUND_Stream_GetMode(player.musica)) & FSOUND_LOOP_NORMAL){
                 player.playpause();
@@ -76,11 +84,6 @@ int main() {
             //a próxima música
             player.backnext(true);
         }
-        
-        //atualiza a tela 
-        blit(player.tela, screen, 0, 0, 0, 0, 640, 480);
-        //descansa 1 milisegundo para não usar muito cpu
-        rest(1);
     }
     deinit();
   	
