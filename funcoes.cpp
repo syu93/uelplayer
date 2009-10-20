@@ -29,6 +29,7 @@ typedef struct Player{
     void inicializar();
     void mouseesquerdo();
     void backnext(bool next);
+    void atualiza();
 };
 
 void init();
@@ -62,8 +63,6 @@ void Player::playpause(){
         FSOUND_SetPaused(0, true);
     }
     blit(tela, screen, 0, 0, 0, 0, 640, 480);
-    //aguarda um intervalo para poder pausar/despausar
-    rest(150);
 }
 
 void Player::layout(){
@@ -224,7 +223,6 @@ void Player::mouseesquerdo(){
     //ativa/desativa o modo mudo
     } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
         FSOUND_SetMute(0, !FSOUND_GetMute(0));
-        rest(150);
     //ativa desativa repeat      
     } else if ((distponto(mouse_x, mouse_y, REPEAT_X, REPEAT_Y)) <= 18){
         if(!((FSOUND_Stream_GetMode(musica)) & FSOUND_LOOP_NORMAL)){
@@ -236,7 +234,6 @@ void Player::mouseesquerdo(){
             playpause();
             FSOUND_Stream_Stop(musica);
         }
-        rest(150);
     //próxima música    
     } else if ((distponto(mouse_x, mouse_y, FWARD_X, FWARD_Y)) <= 18){
         backnext(true);
@@ -333,6 +330,10 @@ void Player::inicializar(){
             
     //abre o arquivo de aúdio do nome inserido
     musica = FSOUND_Stream_Open(arquivo, 0, 0, 0);
+}
+
+void Player::atualiza(){
+	blit(tela, screen, 0, 0, 0, 0, 640, 480);    
 }
 
 // inicialização do allegro
