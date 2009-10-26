@@ -16,7 +16,7 @@ typedef struct Player{
     int tot;
         
     //nome do arquivo atual
-    char arquivo[100];
+    char arquivo[MAX_NAME];
     
     //bitmap para representar a tela
     BITMAP *tela;
@@ -29,7 +29,6 @@ typedef struct Player{
     void inicializar();
     void mouseesquerdo();
     void backnext(bool next);
-    void atualiza();
 };
 
 void init();
@@ -55,7 +54,7 @@ void Player::playpause(){
         textprintf_ex(tela, font, 500, 401, makecol(255,255,255), -1, "%d : %d%d", ms/60000, ((ms/1000)%60)/10, (ms/1000)%10);
         //despausa se necessário
         FSOUND_SetPaused(0, false);
-        //toca a música
+		//toca a música
         FSOUND_Stream_Play(0, musica);
     } else {
         triangle(tela, 320, 440, 332, 445, 320, 450, makecol(255,255,255));
@@ -131,6 +130,7 @@ void Player::criarbiblioteca(){
     dirent* item_dir;
     int i;
 
+	//cria pasta
     mkdir("data");
     //cria biblioteca
     bib = fopen("data\\biblioteca.txt", "w");
@@ -166,7 +166,7 @@ void Player::imprimirbiblioteca(){
     int i, j;
         
     bib = fopen("data\\biblioteca.txt", "r");
-    for(i = 1, j = 100; !feof(bib); i += 8){
+    for(i = 1, j = MAX_NAME; !feof(bib); i += 8){
         letra = fgetc(bib);
         //escreve uma linha
         if(letra != '\n' && letra != -1){
@@ -243,7 +243,7 @@ void Player::mouseesquerdo(){
     //ajusta o volume
     } else if (mouse_y <= VOL_Y2 && mouse_x <= VOL_X2){
         if ((VOL_Y2-mouse_y) <= (mouse_x-VOL_X1)/4){
-            FSOUND_SetVolume(0, int((mouse_x-VOL_X1) * 2.55));
+            FSOUND_SetVolumeAbsolute(0, int((mouse_x-VOL_X1) * 2.55));
             triangle(tela, VOL_X2, VOL_Y1, VOL_X1, VOL_Y2, VOL_X2, VOL_Y2, makecol(255,255,255));
             triangle(tela, mouse_x, VOL_Y2-(mouse_x-VOL_X1)/4, VOL_X1, VOL_Y2, mouse_x, VOL_Y2, makecol(0,50,160));
         }
@@ -252,7 +252,7 @@ void Player::mouseesquerdo(){
 
 void Player::backnext(bool next){
     int i, j;
-    char nome[100]; 
+    char nome[MAX_NAME]; 
                         
     //limpa a string com o nome do diretorio
     strcpy(arquivo, "musicas\\\\");
@@ -275,7 +275,7 @@ void Player::backnext(bool next){
     
     //abre o arquivo de número num
     for(i = 0; i < num; i++){
-        for(j = 0; j < 100; j++){ 
+        for(j = 0; j < MAX_NAME; j++){ 
             nome[j] = getc(bib);
             if (nome[j] == '\n'){
                 nome[j] = '\0';
@@ -289,10 +289,15 @@ void Player::backnext(bool next){
                     
     //para a música antiga
     FSOUND_Stream_Close(musica);
-    
-    //muda o ícone
+    //para o canal de áudio
+    FSOUND_StopSound(0);
+	
+	//muda o ícone
     playpause();
-                
+    
+    //Esvazia o epaço alocado na memória
+	FSOUND_Stream_Close(musica);
+	            
     //abre o arquivo de aúdio do nome inserido
     musica = FSOUND_Stream_Open(arquivo, 0, 0, 0);
     
@@ -302,7 +307,7 @@ void Player::backnext(bool next){
 
 void Player::inicializar(){
     int i, j;
-    char nome[100]; 
+    char nome[MAX_NAME]; 
                         
     //limpa a string com o nome do diretorio
     strcpy(arquivo, "musicas\\\\");
@@ -313,7 +318,7 @@ void Player::inicializar(){
     bib = fopen("data\\biblioteca.txt", "r");
     //abre o arquivo de número num
     for(int i = 0; i < num; i++){
-        for(j = 0; j < 100; j++){ 
+        for(j = 0; j < MAX_NAME; j++){ 
             nome[j] = getc(bib);
             if (nome[j] == '\n'){
                 nome[j] = '\0';
@@ -324,16 +329,13 @@ void Player::inicializar(){
     
     //concatena o nome do arquivo
     strcat(arquivo, nome); 
-                    
-    //para a música antiga
-    FSOUND_Stream_Close(musica);
-            
-    //abre o arquivo de aúdio do nome inserido
+    
+	//abre o arquivo de aúdio do nome inserido
     musica = FSOUND_Stream_Open(arquivo, 0, 0, 0);
-}
-
-void Player::atualiza(){
-	blit(tela, screen, 0, 0, 0, 0, 640, 480);    
+	//configuração inicial: pausada
+    FSOUND_SetPaused(0, true);
+	//configura o volume inicial em torno de 50%
+    FSOUND_SetSFXMasterVolume(127);	 
 }
 
 // inicialização do allegro

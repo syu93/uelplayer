@@ -1,3 +1,6 @@
+//nome de músicas
+#define MAX_NAME 150
+
 //resolução
 #define MAX_X   640
 #define MAX_Y   480

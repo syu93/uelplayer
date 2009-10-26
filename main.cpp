@@ -23,7 +23,7 @@ int main() {
     //variável tipo Player
     Player player;
     //clocks
-    clock_t proximo;
+    clock_t refresh, button;
     
     //inicializações do allegro
     init();
@@ -46,18 +46,14 @@ int main() {
     //carrega a primeira música
     player.inicializar();
     
-    //configura o volume inicial em torno de 50%
-    FSOUND_SetVolume(0, 127);
-    
-    //configuração inicial: pausada
-    FSOUND_SetPaused(0, true);
-	
-	//atualiza a cada 0,01 seg
-	proximo = clock_t(clock() * 1.01 * CLOCKS_PER_SEC);  
+    //atualiza a cada 1ms o refresh da tela
+	refresh = clock_t(clock() * 1.001 * CLOCKS_PER_SEC);
+	//atualiza a cada 50 ms a sensibilidade dos botões
+	button = clock_t(clock() * 1.05 * CLOCKS_PER_SEC); 
     
     // esc para sair do programa
     while (!key[KEY_ESC] && !close_button_pressed){
-        while(clock() * CLOCKS_PER_SEC > proximo){
+        while(clock() * CLOCKS_PER_SEC > refresh){
 			//F1 para ajuda
         	if(key[KEY_F1]){
             	textout_ex(player.tela, font, "AJUDA" , 270, 80, makecol(255,255,255),-1);
@@ -65,7 +61,10 @@ int main() {
         	}
         	//se apertar o botão esquerdo do mouse
         	if (mouse_b & 1){
-            	player.mouseesquerdo();
+            	if(clock() * CLOCKS_PER_SEC > button){
+					player.mouseesquerdo();
+					button = clock_t(clock() * 1.05 * CLOCKS_PER_SEC); 
+				}
         	}
         	//se apertar o botão direito do mouse
 			if (mouse_b & 2){
@@ -85,14 +84,15 @@ int main() {
         	}
         
 			//atualiza a tela 
-       		//player.atualiza();
-        	blit(player.tela, screen, 0, 0, 0, 0, 640, 480);  
-			proximo = clock_t(clock() * 1.01 * CLOCKS_PER_SEC);
+       		blit(player.tela, screen, 0, 0, 0, 0, 640, 480);  
+			refresh = clock_t(clock() * 1.01 * CLOCKS_PER_SEC);
 		}
 		rest(1);
     }
     deinit();
   	
+  	//Esvazia a memória
+  	FSOUND_Stream_Close(player.musica);
     //Fecha a API de áudio
   	FSOUND_Close();
 	
