@@ -51,7 +51,7 @@ void Player::playpause(){
         //imprime o nome da música
         textprintf_ex(tela, font, 10, 401, makecol(255,255,255),-1, "%s", arquivo);
         //imprime a duração da música
-        textprintf_ex(tela, font, 500, 401, makecol(255,255,255), -1, "%d : %d%d", ms/60000, ((ms/1000)%60)/10, (ms/1000)%10);
+        textprintf_ex(tela, font, 560, 401, makecol(255,255,255), -1, "%d : %d%d", ms/60000, ((ms/1000)%60)/10, (ms/1000)%10);
         //despausa se necessário
         FSOUND_SetPaused(0, false);
 		//toca a música
@@ -360,7 +360,7 @@ void init() {
 	}
 
     //funciona sem estar ativo
-    set_display_switch_mode(SWITCH_BACKGROUND);
+    set_display_switch_mode(SWITCH_AMNESIA);
     
     //instala o timer, teclado e mouse
 	install_timer();
