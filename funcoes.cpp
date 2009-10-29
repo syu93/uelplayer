@@ -170,10 +170,12 @@ void Player::imprimirbiblioteca(){
         letra = fgetc(bib);
         //escreve uma linha
         if(letra != '\n' && letra != -1){
-             textprintf_ex(tela, font, i, j, makecol(255,255,255), -1, "%c", letra);
+             textprintf_ex(tela, font, i, j-50, makecol(255,255,255), -1, "%c", letra);
         //pula linha
         } else {
-            j += 8;
+            //epaçamento entre linhas(2)
+			j += 10;
+			//volta a margem esquerda
             i = -7;
         }
     }
@@ -360,7 +362,7 @@ void init() {
 	}
 
     //funciona sem estar ativo
-    set_display_switch_mode(SWITCH_AMNESIA);
+    set_display_switch_mode(SWITCH_BACKGROUND);
     
     //instala o timer, teclado e mouse
 	install_timer();
