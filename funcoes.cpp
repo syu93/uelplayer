@@ -14,12 +14,21 @@ typedef struct Player{
     
     //total de músicas
     int tot;
+    
+    //modo
+    int modo;
         
     //nome do arquivo atual
     char arquivo[MAX_NAME];
     
     //bitmap para representar a tela
-    BITMAP *tela;
+    BITMAP *tela, *aba1, *aba2, *aba3, *aba4, *aba5;
+    
+    //clocks
+    clock_t refresh, button, button2;
+    
+    //construtor
+    Player();
     
     void playpause();
     void layout();
@@ -29,12 +38,41 @@ typedef struct Player{
     void inicializar();
     void mouseesquerdo();
     void backnext(bool next);
+    void atualiza();
 };
 
 void init();
 void deinit();
 void close_button_handle();
 float distponto(int x1, int y1, int x2, int y2);
+
+//construtor
+Player::Player(){
+	//inicializa os clocks
+	refresh = button = button2 = clock_t(clock() * CLOCKS_PER_SEC);
+	
+	// inicia da API FMOD, áudio com 5 canais
+	FSOUND_Init(44100, 5, 0);
+	
+	//inicializações do allegro
+    init();
+	
+	//inicialização das variávies BITMAP
+    tela = create_bitmap(MAX_X, MAX_Y);
+    aba1 = create_bitmap(MAX_X, ABA_Y);
+    aba2 = create_bitmap(MAX_X, ABA_Y);
+    aba3 = create_bitmap(MAX_X, ABA_Y);
+    aba4 = create_bitmap(MAX_X, ABA_Y);
+    aba5 = create_bitmap(MAX_X, ABA_Y);
+    
+	//limpa os bitmaps
+	clear(tela);
+	clear(aba1);
+	clear(aba2);
+	clear(aba3);
+	clear(aba4);
+	clear(aba5);
+}
 
 //botão play/pause 
 void Player::playpause(){
@@ -121,8 +159,6 @@ void Player::layout(){
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(255,255,255),-1);
     
-    textout_ex(tela, font, "F1 para AJUDA ", 270, 70, makecol(255,255,255),-1);
-    
     blit(tela, screen, 0, 0, 0, 0, 640, 480);     
 }
 
@@ -166,23 +202,43 @@ void Player::imprimirbiblioteca(){
     int i, j;
         
     bib = fopen("data\\biblioteca.txt", "r");
-    for(i = 1, j = MAX_NAME; !feof(bib); i += 8){
+    for(i = 1, j = 20; !feof(bib); i += 8){
         letra = fgetc(bib);
         //escreve uma linha
         if(letra != '\n' && letra != -1){
-             textprintf_ex(tela, font, i, j-50, makecol(255,255,255), -1, "%c", letra);
+             textprintf_ex(aba1, font, i, j, makecol(255,255,255), -1, "%c", letra);
         //pula linha
         } else {
-            //epaçamento entre linhas(2)
+            //espaçamento entre linhas(2)
 			j += 10;
 			//volta a margem esquerda
             i = -7;
         }
     }
+    //Desenha a biblioteca na aba 1 e cola na tela
+    blit(aba1, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
 }
 
 void Player::passarmouse(){
-    if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
+    if(mouse_y >= ABA_Y1+20 && mouse_y <= (ABA_Y1+20+ 10*tot-3)){
+		char nome[MAX_NAME];
+		int cont;
+		bib = fopen("data\\biblioteca.txt", "r");
+		cont = int((mouse_y-ABA_Y1-20+1)/10);
+		//copia o nome do arquivo cont
+		for(int i = 0; i <= cont; i++){
+        	for(int j = 0; j < MAX_NAME; j++){ 
+            	nome[j] = getc(bib);
+            	if (nome[j] == '\n'){
+                	nome[j] = '\0';
+                	break;
+				}
+            }
+        }
+        fclose(bib);
+    	//escreve o nome da música em amarelo
+		textout_ex(screen, font, nome, 0, mouse_y-mouse_y%10+1, makecol(255,255,0),0);   
+	} else if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
         if(FSOUND_GetPaused(0)){
             textout_ex(screen, font, "Play", mouse_x-8, mouse_y-8, makecol(255,255,255),0);  
         } else {
@@ -214,9 +270,18 @@ void Player::passarmouse(){
 }
 
 void Player::mouseesquerdo(){
+    //se apertar a região de uma música
+	if (mouse_y >= ABA_Y1+20 && mouse_y <= (ABA_Y1+20+10*tot-2)){
+		FSOUND_Stream_Stop(musica);
+		num = int((mouse_y-ABA_Y1-20)/10);
+		backnext(true);
     //play/pause
-    if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
-        playpause();
+    } else if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
+        if(clock() * CLOCKS_PER_SEC > button){
+			playpause();
+			//atualiza a cada 30 ms a sensibilidade dos botões com funções on/off
+			button = clock_t(clock() * 1.03 * CLOCKS_PER_SEC);
+		}
     //stop
     } else if ((distponto(mouse_x, mouse_y, STOP_X, STOP_Y)) <= 18){
         FSOUND_Stream_Stop(musica);
@@ -224,24 +289,40 @@ void Player::mouseesquerdo(){
         playpause();
     //ativa/desativa o modo mudo
     } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
-        FSOUND_SetMute(0, !FSOUND_GetMute(0));
+		if(clock() * CLOCKS_PER_SEC > button){
+        	FSOUND_SetMute(0, !FSOUND_GetMute(0));
+        	//atualiza a cada 30 ms a sensibilidade dos botões com funções on/off
+			button = clock_t(clock() * 1.03 * CLOCKS_PER_SEC);
+		}
     //ativa desativa repeat      
     } else if ((distponto(mouse_x, mouse_y, REPEAT_X, REPEAT_Y)) <= 18){
-        if(!((FSOUND_Stream_GetMode(musica)) & FSOUND_LOOP_NORMAL)){
-            FSOUND_Stream_SetMode(musica, FSOUND_LOOP_NORMAL);
-        } else {
-            FSOUND_Stream_SetMode(musica, FSOUND_LOOP_OFF);
-        }
-        if(!FSOUND_GetPaused(0)){
-            playpause();
-            FSOUND_Stream_Stop(musica);
-        }
+        if(clock() * CLOCKS_PER_SEC > button){
+			if(!((FSOUND_Stream_GetMode(musica)) & FSOUND_LOOP_NORMAL)){
+            	FSOUND_Stream_SetMode(musica, FSOUND_LOOP_NORMAL);
+        	} else {
+            	FSOUND_Stream_SetMode(musica, FSOUND_LOOP_OFF);
+        	}
+        	if(!FSOUND_GetPaused(0)){
+            	playpause();
+            	FSOUND_Stream_Stop(musica);
+        	}
+        	//atualiza a cada 30 ms a sensibilidade dos botões com funções on/off
+			button = clock_t(clock() * 1.03 * CLOCKS_PER_SEC);
+		}
     //próxima música    
     } else if ((distponto(mouse_x, mouse_y, FWARD_X, FWARD_Y)) <= 18){
-        backnext(true);
+        if(clock() * CLOCKS_PER_SEC > button2){
+			backnext(true);
+			//atualiza a cada 15 ms a sensibilidade dos botões com funções back/next
+			button2 = clock_t(clock() * 1.015 * CLOCKS_PER_SEC);
+		}
     //música anterior
     } else if ((distponto(mouse_x, mouse_y, BWARD_X, BWARD_Y)) <= 18){
-        backnext(false);
+        if(clock() * CLOCKS_PER_SEC > button2){
+			backnext(false);
+			//atualiza a cada 15 ms a sensibilidade dos botões com funções back/next
+			button2 = clock_t(clock() * 1.015 * CLOCKS_PER_SEC);
+		}
     //ajusta o volume
     } else if (mouse_y <= VOL_Y2 && mouse_x <= VOL_X2){
         if ((VOL_Y2-mouse_y) <= (mouse_x-VOL_X1)/4){
@@ -263,16 +344,22 @@ void Player::backnext(bool next){
     
     //avança
     if(next){
-        //não avança quando estiver na última música
+        //se não for a última música avança normalmente
         if(num != tot){
             num++;
-        }
+        //se for a última música avança para a primeira
+        } else {
+			num = 1;
+		}
     //retrocede
     } else {
-        //não retrocede quando estiver na primeira música
+        //se não for a primeira música retrocede normalmente
         if(num != 1){
             num--;
-        }
+        //se for a primeira retrocede para a última
+		} else {
+			num = tot;
+		}
     }
     
     //abre o arquivo de número num
@@ -338,6 +425,20 @@ void Player::inicializar(){
     FSOUND_SetPaused(0, true);
 	//configura o volume inicial em torno de 50%
     FSOUND_SetSFXMasterVolume(127);	 
+}
+
+void Player::atualiza(){
+	//atualiza a cada intervalo refresh
+	if(clock() * CLOCKS_PER_SEC > refresh){
+		//atualiza a tela 
+       	acquire_screen();
+		blit(tela, screen, 0, 0, 0, 0, 640, 480); 
+		release_screen(); 
+		//atualiza a cada 1ms o refresh da tela
+		refresh = clock_t(clock() * 1.001 * CLOCKS_PER_SEC);
+	} else {
+		//rest(1);
+	}
 }
 
 // inicialização do allegro

@@ -22,17 +22,6 @@ volatile int close_button_pressed = false;
 int main() {
     //variável tipo Player
     Player player;
-    //clocks
-    clock_t refresh, button;
-    
-    //inicializações do allegro
-    init();
-    
-    // inicia o áudio com 5 canais
-	FSOUND_Init(44100, 5, 0);
-	
-	//inicialização das variávies
-    player.tela = create_bitmap(MAX_X, MAX_Y);
         
     //carrega a biblioteca
     player.criarbiblioteca();
@@ -46,32 +35,19 @@ int main() {
     //carrega a primeira música
     player.inicializar();
     
-    //atualiza a cada 1ms o refresh da tela
-	refresh = clock_t(clock() * 1.001 * CLOCKS_PER_SEC);
-	//atualiza a cada 30 ms a sensibilidade dos botões
-	button = clock_t(clock() * 1.03 * CLOCKS_PER_SEC); 
-    
     // esc para sair do programa
     while (!key[KEY_ESC] && !close_button_pressed){
-        //F1 para ajuda
-        if(key[KEY_F1]){
-            textout_ex(player.tela, font, "AJUDA" , 270, 80, makecol(255,255,255),-1);
-            blit(player.tela, screen, 0, 0, 0, 0, 640, 480);
-        }
         //se apertar o botão esquerdo do mouse
         if (mouse_b & 1){
-            if(clock() * CLOCKS_PER_SEC > button){
-				player.mouseesquerdo();
-				button = clock_t(clock() * 1.03 * CLOCKS_PER_SEC);
-			}
+            player.mouseesquerdo();
 		}
         //se apertar o botão direito do mouse
 		if (mouse_b & 2){
         //caso passe o mouse por cima de algo
-        } else {
-            player.passarmouse();
-        }
+        } 
         
+		player.passarmouse();
+                
         //quando acabar a música toca de novo
         if(!FSOUND_GetPaused(0) && !FSOUND_IsPlaying(0)){
             //a mesma música
@@ -86,19 +62,16 @@ int main() {
 			int ms = FSOUND_Stream_GetTime(player.musica);
 			textprintf_ex(player.tela, font, 560, 391, makecol(255,255,255), makecol(20,70,180), "%d : %d%d", ms/60000, ((ms/1000)%60)/10, (ms/1000)%10);
 		}
-		if(clock() * CLOCKS_PER_SEC > refresh){
-		//atualiza a tela 
-       	acquire_screen();
-		blit(player.tela, screen, 0, 0, 0, 0, 640, 480); 
-		release_screen(); 
-		refresh = clock_t(clock() * 1.001 * CLOCKS_PER_SEC);
-		} else {
-			//rest(1);
-		}
-    }
+		player.atualiza();
+	}
     deinit();
-  	
-  	//Esvazia a memória
+  	//Esvazia a memória utilizada
+  	destroy_bitmap(player.tela);
+  	destroy_bitmap(player.aba1);
+  	destroy_bitmap(player.aba2);
+  	destroy_bitmap(player.aba3);
+  	destroy_bitmap(player.aba4);
+  	destroy_bitmap(player.aba5);
   	FSOUND_Stream_Close(player.musica);
     //Fecha a API de áudio
   	FSOUND_Close();

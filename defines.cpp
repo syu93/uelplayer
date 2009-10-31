@@ -5,6 +5,18 @@
 #define MAX_X   640
 #define MAX_Y   480
 
+//modos
+#define BIBLIOTECA 	1
+#define PLAYLIST 	2
+#define LETRA 		3
+#define CONFIG 		4
+#define AJUDA 		5
+
+//abas
+#define ABA_Y1 61
+#define ABA_Y2 409
+#define ABA_Y ABA_Y2-ABA_Y1
+
 //botões
 #define REPEAT_X 123
 #define REPEAT_Y 448
