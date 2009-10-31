@@ -49,7 +49,7 @@ float distponto(int x1, int y1, int x2, int y2);
 //construtor
 Player::Player(){
 	//inicializa os clocks
-	refresh = button = button2 = clock_t(clock() * CLOCKS_PER_SEC);
+	refresh = button = button2 = clock();
 	
 	// inicia da API FMOD, áudio com 5 canais
 	FSOUND_Init(44100, 5, 0);
@@ -154,8 +154,8 @@ void Player::layout(){
     line(tela, MUTE_X-7, MUTE_Y-8, MUTE_X+9, MUTE_Y+8, makecol(255,255,255));
     
     //volume
-    triangle(tela, VOL_X2, VOL_Y1, VOL_X1, VOL_Y2, VOL_X2, VOL_Y2, makecol(255,255,255));
-    triangle(tela, VOL_X2-50, VOL_Y1+12, VOL_X1, VOL_Y2, VOL_X2-50, VOL_Y2, makecol(0,50,160));
+    rectfill(tela, VOL_X1, VOL_Y1, VOL_X2, VOL_Y2, makecol(255,255,255));
+    rectfill(tela, VOL_X1, VOL_Y1, VOL_X2-32, VOL_Y2, makecol(0,50,160));
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(255,255,255),-1);
     
@@ -262,11 +262,9 @@ void Player::passarmouse(){
         textout_ex(screen, font, "Anterior", mouse_x-8, mouse_y-8, makecol(255,255,255),0);  
     } else if ((distponto(mouse_x, mouse_y, FWARD_X, FWARD_Y)) <= 18){
         textout_ex(screen, font, "Proxima", mouse_x-8, mouse_y-8, makecol(255,255,255),0);  
-    } else if (mouse_y <= VOL_Y2 && mouse_x <= VOL_X2){
-        if((VOL_Y2-mouse_y) <= (mouse_x-VOL_X1)/4){
-            textprintf_ex(screen, font, mouse_x-20, mouse_y-8, makecol(255,255,255),0, "%Vol %d",mouse_x-VOL_X1);  
-        }
-    }
+    } else if(mouse_x >= VOL_X1 && mouse_y >= VOL_Y1 && mouse_y <= VOL_Y2 && mouse_x <= VOL_X2){
+        textprintf_ex(screen, font, mouse_x-20, mouse_y-8, makecol(255,255,255),0, "%Vol %d", ((mouse_x-VOL_X1)*4+3)*100/255);
+	}
 }
 
 void Player::mouseesquerdo(){
@@ -277,10 +275,9 @@ void Player::mouseesquerdo(){
 		backnext(true);
     //play/pause
     } else if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
-        if(clock() * CLOCKS_PER_SEC > button){
+        if(clock() - button >= BUTTON * CLOCKS_PER_SEC){
 			playpause();
-			//atualiza a cada 30 ms a sensibilidade dos botões com funções on/off
-			button = clock_t(clock() * 1.03 * CLOCKS_PER_SEC);
+			button = clock();
 		}
     //stop
     } else if ((distponto(mouse_x, mouse_y, STOP_X, STOP_Y)) <= 18){
@@ -289,14 +286,13 @@ void Player::mouseesquerdo(){
         playpause();
     //ativa/desativa o modo mudo
     } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
-		if(clock() * CLOCKS_PER_SEC > button){
+		if(clock() - button >= BUTTON * CLOCKS_PER_SEC){
         	FSOUND_SetMute(0, !FSOUND_GetMute(0));
-        	//atualiza a cada 30 ms a sensibilidade dos botões com funções on/off
-			button = clock_t(clock() * 1.03 * CLOCKS_PER_SEC);
+        	button = clock();
 		}
     //ativa desativa repeat      
     } else if ((distponto(mouse_x, mouse_y, REPEAT_X, REPEAT_Y)) <= 18){
-        if(clock() * CLOCKS_PER_SEC > button){
+        if(clock() - button >= BUTTON * CLOCKS_PER_SEC){
 			if(!((FSOUND_Stream_GetMode(musica)) & FSOUND_LOOP_NORMAL)){
             	FSOUND_Stream_SetMode(musica, FSOUND_LOOP_NORMAL);
         	} else {
@@ -306,30 +302,25 @@ void Player::mouseesquerdo(){
             	playpause();
             	FSOUND_Stream_Stop(musica);
         	}
-        	//atualiza a cada 30 ms a sensibilidade dos botões com funções on/off
-			button = clock_t(clock() * 1.03 * CLOCKS_PER_SEC);
+        	button = clock();
 		}
     //próxima música    
     } else if ((distponto(mouse_x, mouse_y, FWARD_X, FWARD_Y)) <= 18){
-        if(clock() * CLOCKS_PER_SEC > button2){
+        if(clock() - button2 >= BUTTON2 * CLOCKS_PER_SEC){
 			backnext(true);
-			//atualiza a cada 15 ms a sensibilidade dos botões com funções back/next
-			button2 = clock_t(clock() * 1.015 * CLOCKS_PER_SEC);
+			button2 = clock();
 		}
     //música anterior
     } else if ((distponto(mouse_x, mouse_y, BWARD_X, BWARD_Y)) <= 18){
-        if(clock() * CLOCKS_PER_SEC > button2){
+        if(clock() - button2 >= BUTTON2 * CLOCKS_PER_SEC){
 			backnext(false);
-			//atualiza a cada 15 ms a sensibilidade dos botões com funções back/next
-			button2 = clock_t(clock() * 1.015 * CLOCKS_PER_SEC);
+			button2 = clock();
 		}
     //ajusta o volume
-    } else if (mouse_y <= VOL_Y2 && mouse_x <= VOL_X2){
-        if ((VOL_Y2-mouse_y) <= (mouse_x-VOL_X1)/4){
-            FSOUND_SetVolumeAbsolute(0, int((mouse_x-VOL_X1) * 2.55));
-            triangle(tela, VOL_X2, VOL_Y1, VOL_X1, VOL_Y2, VOL_X2, VOL_Y2, makecol(255,255,255));
-            triangle(tela, mouse_x, VOL_Y2-(mouse_x-VOL_X1)/4, VOL_X1, VOL_Y2, mouse_x, VOL_Y2, makecol(0,50,160));
-        }
+    } else if (mouse_x >= VOL_X1 && mouse_y >= VOL_Y1 && mouse_y <= VOL_Y2 && mouse_x <= VOL_X2){
+         FSOUND_SetVolumeAbsolute(0, (mouse_x-VOL_X1) * 4 + 1);
+         rectfill(tela, VOL_X1, VOL_Y1, VOL_X2, VOL_Y2, makecol(255,255,255));
+         rectfill(tela, VOL_X1, VOL_Y1, mouse_x, VOL_Y2, makecol(0,50,160));
     }
 }
 
@@ -429,15 +420,15 @@ void Player::inicializar(){
 
 void Player::atualiza(){
 	//atualiza a cada intervalo refresh
-	if(clock() * CLOCKS_PER_SEC > refresh){
+	if(clock() - refresh >= REFRESH * CLOCKS_PER_SEC){
 		//atualiza a tela 
        	acquire_screen();
-		blit(tela, screen, 0, 0, 0, 0, 640, 480); 
-		release_screen(); 
-		//atualiza a cada 1ms o refresh da tela
-		refresh = clock_t(clock() * 1.001 * CLOCKS_PER_SEC);
+       	blit(tela, screen, 0, 0, 0, 0, 640, 480);
+		release_screen();
+		refresh = clock();
 	} else {
-		//rest(1);
+		//descansa 1 ms para economizar CPU
+		rest(1);
 	}
 }
 

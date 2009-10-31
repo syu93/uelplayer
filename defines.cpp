@@ -1,9 +1,14 @@
 //nome de músicas
-#define MAX_NAME 150
+#define MAX_NAME 	150
 
 //resolução
-#define MAX_X   640
-#define MAX_Y   480
+#define MAX_X   	640
+#define MAX_Y   	480
+
+//tempos
+#define REFRESH 	0.002 //1ms
+#define BUTTON 		0.200 //200ms
+#define BUTTON2 	0.150 //150ms
 
 //modos
 #define BIBLIOTECA 	1
@@ -13,26 +18,26 @@
 #define AJUDA 		5
 
 //abas
-#define ABA_Y1 61
-#define ABA_Y2 409
-#define ABA_Y ABA_Y2-ABA_Y1
+#define ABA_Y1 		61
+#define ABA_Y2 		409
+#define ABA_Y 		ABA_Y2-ABA_Y1
 
 //botões
-#define REPEAT_X 123
-#define REPEAT_Y 448
-#define PLAY_X   323
-#define PLAY_Y   448
-#define STOP_X   203
-#define STOP_Y   448
-#define FWARD_X  373
-#define FWARD_Y  448
-#define BWARD_X  273
-#define BWARD_Y  448
-#define MUTE_X   603
-#define MUTE_Y   448
+#define REPEAT_X 	123
+#define REPEAT_Y 	448
+#define PLAY_X   	323
+#define PLAY_Y   	448
+#define STOP_X   	203
+#define STOP_Y   	448
+#define FWARD_X  	373
+#define FWARD_Y  	448
+#define BWARD_X  	273
+#define BWARD_Y  	448
+#define MUTE_X   	603
+#define MUTE_Y   	448
 
 //volume
-#define VOL_X1   470
-#define VOL_X2   570
-#define VOL_Y1   435
-#define VOL_Y2   460
+#define VOL_X1   	501
+#define VOL_X2   	564
+#define VOL_Y1   	436
+#define VOL_Y2   	455
