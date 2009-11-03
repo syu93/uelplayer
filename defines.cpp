@@ -6,7 +6,7 @@
 #define MAX_Y   	480
 
 //tempos
-#define REFRESH 	0.002 //1ms
+#define REFRESH 	0.002 //2ms
 #define BUTTON 		0.200 //200ms
 #define BUTTON2 	0.150 //150ms
 

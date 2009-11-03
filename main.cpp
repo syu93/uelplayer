@@ -61,7 +61,7 @@ int main() {
         if(FSOUND_IsPlaying(0)){
 			int ms = FSOUND_Stream_GetTime(player.musica);
 			textprintf_ex(player.tela, font, 560, 391, makecol(255,255,255), makecol(20,70,180), "%d : %d%d", ms/60000, ((ms/1000)%60)/10, (ms/1000)%10);
-		}
+		} 
 		player.atualiza();
 	}
     deinit();

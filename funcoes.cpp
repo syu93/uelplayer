@@ -31,6 +31,7 @@ typedef struct Player{
     Player();
     
     void playpause();
+    void repeat();
     void layout();
     void criarbiblioteca();
     void imprimirbiblioteca();
@@ -87,7 +88,9 @@ void Player::playpause(){
         rectfill(tela, 1, 381, 640, 410, makecol(20,70,180));
         rectfill(tela, 1, 411, 640, 420, makecol(0,50,160));
         //imprime o nome da música
-        textprintf_ex(tela, font, 10, 401, makecol(255,255,255),-1, "%s", arquivo);
+        char nome[MAX_NAME] = "";
+        strcat(nome, arquivo+9);
+		textprintf_ex(tela, font, 6, 401, makecol(255,255,255),-1, "%s", nome);
         //imprime a duração da música
         textprintf_ex(tela, font, 560, 401, makecol(255,255,255), -1, "%d : %d%d", ms/60000, ((ms/1000)%60)/10, (ms/1000)%10);
         //despausa se necessário
@@ -100,6 +103,28 @@ void Player::playpause(){
         FSOUND_SetPaused(0, true);
     }
     blit(tela, screen, 0, 0, 0, 0, 640, 480);
+}
+
+void Player::repeat(){
+	circlefill(tela, REPEAT_X, REPEAT_Y, 18, makecol(20,70,180));
+    circlefill(tela, REPEAT_X-3, REPEAT_Y-3, 15, makecol(0,50,160));
+    //seta repeat
+	if(!((FSOUND_Stream_GetMode(musica)) & FSOUND_LOOP_NORMAL)){
+        FSOUND_Stream_SetMode(musica, FSOUND_LOOP_NORMAL);
+        circle(tela, REPEAT_X, REPEAT_Y, 8, makecol(255,255,255));
+    	circle(tela, REPEAT_X, REPEAT_Y, 9, makecol(255,255,255));
+    	circle(tela, REPEAT_X, REPEAT_Y, 10, makecol(255,255,255));
+    	triangle(tela, REPEAT_X+5, 440, REPEAT_X+15, 445, REPEAT_X+5, 450, makecol(255,255,255));
+    //cancela repeat
+	} else {
+        FSOUND_Stream_SetMode(musica, FSOUND_LOOP_OFF);
+        rectfill(tela, REPEAT_X-8, REPEAT_Y-2, REPEAT_X+8, REPEAT_Y+1, makecol(255,255,255));
+        triangle(tela, REPEAT_X+5, REPEAT_Y+5, REPEAT_X+10, REPEAT_Y, REPEAT_X+5, REPEAT_Y-5, makecol(255,255,255));
+    }
+    if(!FSOUND_GetPaused(0)){
+        playpause();
+        FSOUND_Stream_Stop(musica);
+    }
 }
 
 void Player::layout(){
@@ -123,10 +148,8 @@ void Player::layout(){
     //repeat
     circlefill(tela, REPEAT_X, REPEAT_Y, 18, makecol(20,70,180));
     circlefill(tela, REPEAT_X-3, REPEAT_Y-3, 15, makecol(0,50,160));
-    circle(tela, REPEAT_X, REPEAT_Y, 8, makecol(255,255,255));
-    circle(tela, REPEAT_X, REPEAT_Y, 9, makecol(255,255,255));
-    circle(tela, REPEAT_X, REPEAT_Y, 10, makecol(255,255,255));
-    triangle(tela, REPEAT_X+5, 440, REPEAT_X+15, 445, REPEAT_X+5, 450, makecol(255,255,255));
+    rectfill(tela, REPEAT_X-8, REPEAT_Y-2, REPEAT_X+8, REPEAT_Y+1, makecol(255,255,255));
+    triangle(tela, REPEAT_X+5, REPEAT_Y+5, REPEAT_X+10, REPEAT_Y, REPEAT_X+5, REPEAT_Y-5, makecol(255,255,255));
     
     //stop 
     circlefill(tela, STOP_X, STOP_Y,18,makecol(20,70,180));
@@ -158,7 +181,12 @@ void Player::layout(){
     rectfill(tela, VOL_X1, VOL_Y1, VOL_X2-32, VOL_Y2, makecol(0,50,160));
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(255,255,255),-1);
-    
+    textout_ex(tela, font, "Biblioteca", 20, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "PlayList", 160, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "Letra", 300, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "Configuracoes", 420, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "Ajuda", 560, 40, makecol(255,255,255),-1);
+        
     blit(tela, screen, 0, 0, 0, 0, 640, 480);     
 }
 
@@ -284,6 +312,8 @@ void Player::mouseesquerdo(){
         FSOUND_Stream_Stop(musica);
         FSOUND_SetPaused(0, false);
         playpause();
+        //imprime 0 seg/min
+        textprintf_ex(tela, font, 560, 391, makecol(255,255,255), makecol(20,70,180), "%d : %d%d", 0, 0, 0);
     //ativa/desativa o modo mudo
     } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
 		if(clock() - button >= BUTTON * CLOCKS_PER_SEC){
@@ -293,15 +323,7 @@ void Player::mouseesquerdo(){
     //ativa desativa repeat      
     } else if ((distponto(mouse_x, mouse_y, REPEAT_X, REPEAT_Y)) <= 18){
         if(clock() - button >= BUTTON * CLOCKS_PER_SEC){
-			if(!((FSOUND_Stream_GetMode(musica)) & FSOUND_LOOP_NORMAL)){
-            	FSOUND_Stream_SetMode(musica, FSOUND_LOOP_NORMAL);
-        	} else {
-            	FSOUND_Stream_SetMode(musica, FSOUND_LOOP_OFF);
-        	}
-        	if(!FSOUND_GetPaused(0)){
-            	playpause();
-            	FSOUND_Stream_Stop(musica);
-        	}
+			repeat();
         	button = clock();
 		}
     //próxima música    
