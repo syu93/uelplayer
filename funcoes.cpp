@@ -179,10 +179,8 @@ void Player::layout(){
     //mudo
     circlefill(tela, MUTE_X, MUTE_Y, 15, makecol(20,70,180));
     circlefill(tela, MUTE_X-3, MUTE_Y-3, 12, makecol(0,50,160));
-    line(tela, MUTE_X-8, MUTE_Y+8, MUTE_X+8, MUTE_Y-8, makecol(255,255,255));
-    line(tela, MUTE_X-7, MUTE_Y+8, MUTE_X+9, MUTE_Y-8, makecol(255,255,255));
-    line(tela, MUTE_X-8, MUTE_Y-8, MUTE_X+8, MUTE_Y+8, makecol(255,255,255));
-    line(tela, MUTE_X-7, MUTE_Y-8, MUTE_X+9, MUTE_Y+8, makecol(255,255,255));
+    int points[8] = {MUTE_X+8,MUTE_Y+8, MUTE_X+8,MUTE_Y-8, MUTE_X-4,MUTE_Y-4,  MUTE_X-4,MUTE_Y+4};
+	polygon(tela, 4, points, makecol(255, 255, 255));
     
     //volume
     rectfill(tela, VOL_X1, VOL_Y1, VOL_X2, VOL_Y2, makecol(255,255,255));
@@ -201,6 +199,18 @@ void Player::layout(){
     line(tela, ABA_X4, 35, ABA_X4, 55, makecol(255,255,255));
             
     blit(tela, screen, 0, 0, 0, 0, 640, 480);     
+	
+	//imprime ajuda na aba5
+    textout_ex(aba5, font, "Insira as musicas na pasta musicas", 5, 5, makecol(255,255,255),-1);
+    textout_ex(aba5, font, "Insira as letras na pasta letras", 5, 25, makecol(255,255,255),-1);
+    textout_ex(aba5, font, "Os manuais das bibliotecas utilizadas estao na pasta manuais", 5, 45, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Sobre:", 5, 85, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Breno Naodi Kusunoki", 5, 105, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Ernesto Yuiti Saito", 5, 125, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Marcos Okamura Rodrigues", 5, 145, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Robson Fumio Fujii", 5, 165, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Universidade Estadual de Londrina", 5, 205, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Ciencia da Computacao", 5, 225, makecol(255,255,255),-1);
 }
 
 void Player::criarbiblioteca(){
@@ -381,6 +391,20 @@ void Player::mouseesquerdo(){
     } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
 		if(clock() - button >= BUTTON * CLOCKS_PER_SEC){
         	FSOUND_SetMute(0, !FSOUND_GetMute(0));
+        	circlefill(tela, MUTE_X, MUTE_Y, 15, makecol(20,70,180));
+    		circlefill(tela, MUTE_X-3, MUTE_Y-3, 12, makecol(0,50,160));
+			//cria um poligono
+			int points[8] = {MUTE_X+8,MUTE_Y+8, MUTE_X+8,MUTE_Y-8, MUTE_X-4,MUTE_Y-4,  MUTE_X-4,MUTE_Y+4};
+			polygon(tela, 4, points, makecol(255, 255, 255));
+			if(FSOUND_GetMute(0)){
+				
+    			line(tela, MUTE_X-8, MUTE_Y+8, MUTE_X+8, MUTE_Y-8, makecol(255,0,0));
+    			line(tela, MUTE_X-7, MUTE_Y+8, MUTE_X+9, MUTE_Y-8, makecol(255,0,0));
+    			line(tela, MUTE_X-8, MUTE_Y-8, MUTE_X+8, MUTE_Y+8, makecol(255,0,0));
+    			line(tela, MUTE_X-7, MUTE_Y-8, MUTE_X+9, MUTE_Y+8, makecol(255,0,0));
+			}
+			
+    		
         	button = clock();
 		}
     //ativa desativa repeat      
@@ -511,9 +535,18 @@ void Player::atualiza(){
        	//biblioteca
 		if(modo == BIBLIOTECA){
 			blit(aba1, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);		   
+		//playlist
+		}else if(modo == PLAYLIST){
+			blit(aba2, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
 		//letra
-		}else{
+		}else if(modo == LETRA){
 			blit(aba3, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
+		//configurações
+		}else if(modo == CONFIG){
+			blit(aba4, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
+		//ajuda
+		} else {
+			blit(aba5, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
 		}
 		blit(tela, screen, 0, 0, 0, 0, MAX_X, MAX_Y);
 		release_screen();
