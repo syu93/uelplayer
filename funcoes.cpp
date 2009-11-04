@@ -7,7 +7,7 @@ typedef struct Player{
     DIR *dir;
     
     //arquivo utilizado pelo programa
-    FILE *bib;
+    FILE *bib, *let;
     
     //número da música
     int num;
@@ -17,7 +17,7 @@ typedef struct Player{
     
     //modo
     int modo;
-        
+            
     //nome do arquivo atual
     char arquivo[MAX_NAME];
     
@@ -40,6 +40,7 @@ typedef struct Player{
     void mouseesquerdo();
     void backnext(bool next);
     void atualiza();
+    void letras();
 };
 
 void init();
@@ -73,6 +74,9 @@ Player::Player(){
 	clear(aba3);
 	clear(aba4);
 	clear(aba5);
+	
+	//começa exibindo a biblioteca
+	modo = BIBLIOTECA;
 }
 
 //botão play/pause 
@@ -97,6 +101,7 @@ void Player::playpause(){
         FSOUND_SetPaused(0, false);
 		//toca a música
         FSOUND_Stream_Play(0, musica);
+        letras();
     } else {
         triangle(tela, 320, 440, 332, 445, 320, 450, makecol(255,255,255));
         //pausa
@@ -122,8 +127,11 @@ void Player::repeat(){
         triangle(tela, REPEAT_X+5, REPEAT_Y+5, REPEAT_X+10, REPEAT_Y, REPEAT_X+5, REPEAT_Y-5, makecol(255,255,255));
     }
     if(!FSOUND_GetPaused(0)){
-        playpause();
+        int ms = FSOUND_Stream_GetTime(musica);
+		playpause();
         FSOUND_Stream_Stop(musica);
+        FSOUND_Stream_SetTime(musica, ms);
+        playpause();
     }
 }
 
@@ -181,12 +189,17 @@ void Player::layout(){
     rectfill(tela, VOL_X1, VOL_Y1, VOL_X2-32, VOL_Y2, makecol(0,50,160));
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(255,255,255),-1);
-    textout_ex(tela, font, "Biblioteca", 20, 40, makecol(255,255,255),-1);
-    textout_ex(tela, font, "PlayList", 160, 40, makecol(255,255,255),-1);
-    textout_ex(tela, font, "Letra", 300, 40, makecol(255,255,255),-1);
-    textout_ex(tela, font, "Configuracoes", 420, 40, makecol(255,255,255),-1);
-    textout_ex(tela, font, "Ajuda", 560, 40, makecol(255,255,255),-1);
-        
+    textout_ex(tela, font, "Biblioteca", ABA_X1-90, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "PlayList", ABA_X2-90, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "Letra", ABA_X3-90, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "Configuracoes", ABA_X4-110, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "Ajuda", ABA_X4+50, 40, makecol(255,255,255),-1);
+    
+    line(tela, ABA_X1, 35, ABA_X1, 55, makecol(255,255,255));
+    line(tela, ABA_X2, 35, ABA_X2, 55, makecol(255,255,255));
+    line(tela, ABA_X3, 35, ABA_X3, 55, makecol(255,255,255));
+    line(tela, ABA_X4, 35, ABA_X4, 55, makecol(255,255,255));
+            
     blit(tela, screen, 0, 0, 0, 0, 640, 480);     
 }
 
@@ -219,10 +232,43 @@ void Player::criarbiblioteca(){
     }
     //atribui o total de músicas na pasta
     tot = i;
+    //se não houver nenhuma música
+    if(tot == 0){
+		allegro_message("Insira pelo menos uma musica na pasta musicas");
+	}
     //fecha o diretório 
     closedir(dir);
     //fecha o arquivo
     fclose(bib);
+}
+
+void Player::letras(){
+	char letra;
+    int i, j;
+    
+	char nome[MAX_NAME]="letras\\";
+	strcat(nome, arquivo+9);
+	strcat(nome, ".txt\0");
+	let = fopen(nome, "r");    
+    clear(aba3);
+	if(let != NULL){
+    	for(i = 1, j = 20; !feof(let); i += 8){
+        	letra = fgetc(let);
+        	//escreve uma linha
+        	if(letra != '\n' && letra != -1){
+             	textprintf_ex(aba3, font, i, j, makecol(255,255,255), 0, "%c", letra);
+        	//pula linha
+        	} else {
+            	//espaçamento entre linhas(2)
+				j += 10;
+				//volta a margem esquerda
+            	i = -7;
+        	}
+		}
+    	//Desenha a letra na aba 3 e cola na tela
+    	fclose(let);
+	}
+	
 }
 
 void Player::imprimirbiblioteca(){
@@ -249,23 +295,25 @@ void Player::imprimirbiblioteca(){
 
 void Player::passarmouse(){
     if(mouse_y >= ABA_Y1+20 && mouse_y <= (ABA_Y1+20+ 10*tot-3)){
-		char nome[MAX_NAME];
-		int cont;
-		bib = fopen("data\\biblioteca.txt", "r");
-		cont = int((mouse_y-ABA_Y1-20+1)/10);
-		//copia o nome do arquivo cont
-		for(int i = 0; i <= cont; i++){
-        	for(int j = 0; j < MAX_NAME; j++){ 
-            	nome[j] = getc(bib);
-            	if (nome[j] == '\n'){
-                	nome[j] = '\0';
-                	break;
-				}
-            }
-        }
-        fclose(bib);
-    	//escreve o nome da música em amarelo
-		textout_ex(screen, font, nome, 0, mouse_y-mouse_y%10+1, makecol(255,255,0),0);   
+		if(modo == BIBLIOTECA){
+			char nome[MAX_NAME];
+			int cont;
+			bib = fopen("data\\biblioteca.txt", "r");
+			cont = int((mouse_y-ABA_Y1-20+1)/10);
+			//copia o nome do arquivo cont
+			for(int i = 0; i <= cont; i++){
+        		for(int j = 0; j < MAX_NAME; j++){ 
+            		nome[j] = getc(bib);
+            		if (nome[j] == '\n'){
+                		nome[j] = '\0';
+                		break;
+					}
+            	}
+        	}
+        	fclose(bib);
+    		//escreve o nome da música em amarelo
+			textout_ex(screen, font, nome, 0, mouse_y-mouse_y%10+1, makecol(255,255,0),0);
+		}   
 	} else if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
         if(FSOUND_GetPaused(0)){
             textout_ex(screen, font, "Play", mouse_x-8, mouse_y-8, makecol(255,255,255),0);  
@@ -296,7 +344,22 @@ void Player::passarmouse(){
 }
 
 void Player::mouseesquerdo(){
-    //se apertar a região de uma música
+    if(mouse_y <= 55 && mouse_y >= 35){
+		if(mouse_x <= ABA_X1){
+		
+		} if(mouse_x <= ABA_X1){
+			modo = BIBLIOTECA;
+		} else if(mouse_x <= ABA_X2){
+			modo = PLAYLIST;
+		} else if(mouse_x <= ABA_X3){
+			modo = LETRA;
+		} else if(mouse_x <= ABA_X4){
+			modo = CONFIG;
+		} else{
+			modo = AJUDA;
+		}
+	}
+	//se apertar a região de uma música
 	if (mouse_y >= ABA_Y1+20 && mouse_y <= (ABA_Y1+20+10*tot-2)){
 		FSOUND_Stream_Stop(musica);
 		num = int((mouse_y-ABA_Y1-20)/10);
@@ -445,7 +508,14 @@ void Player::atualiza(){
 	if(clock() - refresh >= REFRESH * CLOCKS_PER_SEC){
 		//atualiza a tela 
        	acquire_screen();
-       	blit(tela, screen, 0, 0, 0, 0, 640, 480);
+       	//biblioteca
+		if(modo == BIBLIOTECA){
+			blit(aba1, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);		   
+		//letra
+		}else{
+			blit(aba3, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
+		}
+		blit(tela, screen, 0, 0, 0, 0, MAX_X, MAX_Y);
 		release_screen();
 		refresh = clock();
 	} else {

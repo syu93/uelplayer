@@ -19,8 +19,13 @@
 
 //abas
 #define ABA_Y1 		61
-#define ABA_Y2 		409
+#define ABA_Y2 		380
 #define ABA_Y 		ABA_Y2-ABA_Y1
+#define ABA_X1		120
+#define ABA_X2		240	
+#define ABA_X3		360
+#define ABA_X4		480	
+
 
 //botões
 #define REPEAT_X 	123
