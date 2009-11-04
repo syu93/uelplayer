@@ -26,7 +26,6 @@
 #define ABA_X3		360
 #define ABA_X4		480	
 
-
 //botões
 #define REPEAT_X 	123
 #define REPEAT_Y 	448
@@ -40,6 +39,13 @@
 #define BWARD_Y  	448
 #define MUTE_X   	603
 #define MUTE_Y   	448
+
+//posição
+#define POS_X1		5
+#define POS_X2		505
+#define POS_Y1		388
+#define POS_Y2		392
+
 
 //volume
 #define VOL_X1   	501

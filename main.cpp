@@ -60,6 +60,10 @@ int main() {
         //horário atual da música
         if(FSOUND_IsPlaying(0)){
 			int ms = FSOUND_Stream_GetTime(player.musica);
+			int time = FSOUND_Stream_GetLengthMs(player.musica);
+			int dur = ms*500/time;
+			rectfill(player.tela, POS_X1, POS_Y1, POS_X2, POS_Y2, makecol(0,0,0));
+			rectfill(player.tela, POS_X1, POS_Y1, POS_X1+dur, POS_Y2, makecol(255,255,0));
 			textprintf_ex(player.tela, font, 560, 391, makecol(255,255,255), makecol(20,70,180), "%d : %d%d", ms/60000, ((ms/1000)%60)/10, (ms/1000)%10);
 		} 
 		player.atualiza();

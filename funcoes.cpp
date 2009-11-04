@@ -41,6 +41,8 @@ typedef struct Player{
     void backnext(bool next);
     void atualiza();
     void letras();
+    void mute();
+    void abas();
 };
 
 void init();
@@ -193,12 +195,16 @@ void Player::layout(){
     textout_ex(tela, font, "Configuracoes", ABA_X4-110, 40, makecol(255,255,255),-1);
     textout_ex(tela, font, "Ajuda", ABA_X4+50, 40, makecol(255,255,255),-1);
     
-    line(tela, ABA_X1, 35, ABA_X1, 55, makecol(255,255,255));
+    //linhas das abas
+	line(tela, ABA_X1, 35, ABA_X1, 55, makecol(255,255,255));
     line(tela, ABA_X2, 35, ABA_X2, 55, makecol(255,255,255));
     line(tela, ABA_X3, 35, ABA_X3, 55, makecol(255,255,255));
     line(tela, ABA_X4, 35, ABA_X4, 55, makecol(255,255,255));
             
-    blit(tela, screen, 0, 0, 0, 0, 640, 480);     
+    //posição da música
+    rectfill(tela, POS_X1, POS_Y1, POS_X2, POS_Y2, makecol(0,0,0));
+	
+	blit(tela, screen, 0, 0, 0, 0, 640, 480);     
 	
 	//imprime ajuda na aba5
     textout_ex(aba5, font, "Insira as musicas na pasta musicas", 5, 5, makecol(255,255,255),-1);
@@ -353,28 +359,58 @@ void Player::passarmouse(){
 	}
 }
 
-void Player::mouseesquerdo(){
-    if(mouse_y <= 55 && mouse_y >= 35){
-		if(mouse_x <= ABA_X1){
-		
-		} if(mouse_x <= ABA_X1){
-			modo = BIBLIOTECA;
-		} else if(mouse_x <= ABA_X2){
-			modo = PLAYLIST;
-		} else if(mouse_x <= ABA_X3){
-			modo = LETRA;
-		} else if(mouse_x <= ABA_X4){
-			modo = CONFIG;
-		} else{
-			modo = AJUDA;
-		}
+void Player::abas(){
+	if(mouse_x <= ABA_X1){
+		modo = BIBLIOTECA;
+	} else if(mouse_x <= ABA_X2){
+		modo = PLAYLIST;
+	} else if(mouse_x <= ABA_X3){
+		modo = LETRA;
+	} else if(mouse_x <= ABA_X4){
+		modo = CONFIG;
+	} else{
+		modo = AJUDA;
 	}
+}
+
+void Player::mute(){
+	FSOUND_SetMute(0, !FSOUND_GetMute(0));
+    circlefill(tela, MUTE_X, MUTE_Y, 15, makecol(20,70,180));
+    circlefill(tela, MUTE_X-3, MUTE_Y-3, 12, makecol(0,50,160));
+	//cria um poligono
+	int points[8] = {MUTE_X+8,MUTE_Y+8, MUTE_X+8,MUTE_Y-8, MUTE_X-4,MUTE_Y-4,  MUTE_X-4,MUTE_Y+4};
+	polygon(tela, 4, points, makecol(255, 255, 255));
+	if(FSOUND_GetMute(0)){
+		line(tela, MUTE_X-8, MUTE_Y+8, MUTE_X+8, MUTE_Y-8, makecol(255,0,0));
+    	line(tela, MUTE_X-7, MUTE_Y+8, MUTE_X+9, MUTE_Y-8, makecol(255,0,0));
+    	line(tela, MUTE_X-8, MUTE_Y-8, MUTE_X+8, MUTE_Y+8, makecol(255,0,0));
+    	line(tela, MUTE_X-7, MUTE_Y-8, MUTE_X+9, MUTE_Y+8, makecol(255,0,0));
+	}
+}
+
+void Player::mouseesquerdo(){
+    //abas
+	if(mouse_y <= 55 && mouse_y >= 35){
+		abas();
 	//se apertar a região de uma música
-	if (mouse_y >= ABA_Y1+20 && mouse_y <= (ABA_Y1+20+10*tot-2)){
-		FSOUND_Stream_Stop(musica);
+	}else if (mouse_y >= ABA_Y1+20 && mouse_y <= (ABA_Y1+20+10*tot-2)){
+		//para a música antiga
+    	FSOUND_Stream_Stop(musica);
+    	//para o canal de áudio
+    	FSOUND_StopSound(0);
+	    //Esvazia o epaço alocado na memória
+		FSOUND_Stream_Close(musica);
 		num = int((mouse_y-ABA_Y1-20)/10);
 		backnext(true);
-    //play/pause
+	//seta posição da musica
+	}else if(mouse_y >= POS_Y1 && mouse_y <= POS_Y2 && mouse_x >= POS_X1 && mouse_x <= POS_X2){
+		int time = FSOUND_Stream_GetLengthMs(musica);
+		int ms = (mouse_x - POS_X1)*time/500;
+		//pausa e despausa o canal
+		FSOUND_SetPaused(0, true);
+		FSOUND_Stream_SetTime(musica, ms);
+		FSOUND_SetPaused(0, false);
+	//play/pause
     } else if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
         if(clock() - button >= BUTTON * CLOCKS_PER_SEC){
 			playpause();
@@ -387,25 +423,12 @@ void Player::mouseesquerdo(){
         playpause();
         //imprime 0 seg/min
         textprintf_ex(tela, font, 560, 391, makecol(255,255,255), makecol(20,70,180), "%d : %d%d", 0, 0, 0);
-    //ativa/desativa o modo mudo
+    	rectfill(tela, POS_X1, POS_Y1, POS_X2, POS_Y2, makecol(0,0,0));
+	//ativa/desativa o modo mudo
     } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
 		if(clock() - button >= BUTTON * CLOCKS_PER_SEC){
-        	FSOUND_SetMute(0, !FSOUND_GetMute(0));
-        	circlefill(tela, MUTE_X, MUTE_Y, 15, makecol(20,70,180));
-    		circlefill(tela, MUTE_X-3, MUTE_Y-3, 12, makecol(0,50,160));
-			//cria um poligono
-			int points[8] = {MUTE_X+8,MUTE_Y+8, MUTE_X+8,MUTE_Y-8, MUTE_X-4,MUTE_Y-4,  MUTE_X-4,MUTE_Y+4};
-			polygon(tela, 4, points, makecol(255, 255, 255));
-			if(FSOUND_GetMute(0)){
-				
-    			line(tela, MUTE_X-8, MUTE_Y+8, MUTE_X+8, MUTE_Y-8, makecol(255,0,0));
-    			line(tela, MUTE_X-7, MUTE_Y+8, MUTE_X+9, MUTE_Y-8, makecol(255,0,0));
-    			line(tela, MUTE_X-8, MUTE_Y-8, MUTE_X+8, MUTE_Y+8, makecol(255,0,0));
-    			line(tela, MUTE_X-7, MUTE_Y-8, MUTE_X+9, MUTE_Y+8, makecol(255,0,0));
-			}
-			
-    		
-        	button = clock();
+        	mute();
+			button = clock();
 		}
     //ativa desativa repeat      
     } else if ((distponto(mouse_x, mouse_y, REPEAT_X, REPEAT_Y)) <= 18){
@@ -477,7 +500,7 @@ void Player::backnext(bool next){
     strcat(arquivo, nome); 
                     
     //para a música antiga
-    FSOUND_Stream_Close(musica);
+    FSOUND_Stream_Stop(musica);
     //para o canal de áudio
     FSOUND_StopSound(0);
 	
