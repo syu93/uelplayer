@@ -17,6 +17,9 @@ typedef struct Player{
     
     //modo
     int modo;
+    
+    //cores;
+    int cor, cor2;
             
     //nome do arquivo atual
     char arquivo[MAX_NAME];
@@ -43,6 +46,7 @@ typedef struct Player{
     void letras();
     void mute();
     void abas();
+    void config();
 };
 
 void init();
@@ -79,20 +83,24 @@ Player::Player(){
 	
 	//começa exibindo a biblioteca
 	modo = BIBLIOTECA;
+	
+	//cores
+	cor = BLUE;
+	cor2 = BLUE2;
 }
 
 //botão play/pause 
 void Player::playpause(){
-    circlefill(tela, PLAY_X, PLAY_Y, 23, makecol(20,70,180));
-    circlefill(tela, 320, 445, 20, makecol(0,50,160));
+    circlefill(tela, PLAY_X, PLAY_Y, 23, cor);
+    circlefill(tela, 320, 445, 20, cor2);
     //se não estiver pausado
     if(FSOUND_GetPaused(0)){
         //guarda a duração da música em milisegundos
         int ms = FSOUND_Stream_GetLengthMs(musica);
         rectfill(tela, 318, 440, 321, 455, makecol(255,255,255));
         rectfill(tela, 325, 440, 328, 455, makecol(255,255,255));
-        rectfill(tela, 1, 381, 640, 410, makecol(20,70,180));
-        rectfill(tela, 1, 411, 640, 420, makecol(0,50,160));
+        rectfill(tela, 1, 381, 640, 410, cor);
+        rectfill(tela, 1, 411, 640, 420, cor2);
         //imprime o nome da música
         char nome[MAX_NAME] = "";
         strcat(nome, arquivo+9);
@@ -113,8 +121,8 @@ void Player::playpause(){
 }
 
 void Player::repeat(){
-	circlefill(tela, REPEAT_X, REPEAT_Y, 18, makecol(20,70,180));
-    circlefill(tela, REPEAT_X-3, REPEAT_Y-3, 15, makecol(0,50,160));
+	circlefill(tela, REPEAT_X, REPEAT_Y, 18, cor);
+    circlefill(tela, REPEAT_X-3, REPEAT_Y-3, 15, cor2);
     //seta repeat
 	if(!((FSOUND_Stream_GetMode(musica)) & FSOUND_LOOP_NORMAL)){
         FSOUND_Stream_SetMode(musica, FSOUND_LOOP_NORMAL);
@@ -138,55 +146,55 @@ void Player::repeat(){
 }
 
 void Player::layout(){
-     //desenha um retângulo azul em cima
-    rectfill(tela, 1, 1, 640, 50, makecol(20,70,180));
-    rectfill(tela, 1, 51, 640, 60, makecol(0,50,160));
+     //desenha um retângulo em cima
+    rectfill(tela, 1, 1, 640, 50, cor);
+    rectfill(tela, 1, 51, 640, 60, cor2);
 
-    //desenha um retângulo azul em baixo
-    rectfill(tela, 1, 381, 640, 410, makecol(20,70,180));
-    rectfill(tela, 1, 411, 640, 420, makecol(0,50,160));
+    //desenha um retângulo em baixo
+    rectfill(tela, 1, 381, 640, 410, cor);
+    rectfill(tela, 1, 411, 640, 420, cor2);
 
     //desenha um retângulo prata
     rectfill(tela, 1, 421, 640, 470, makecol(150,150,150));
     rectfill(tela, 1, 471, 640, 480, makecol(130,130,130));
 
     //botão play 
-    circlefill(tela, PLAY_X, PLAY_Y, 23, makecol(20,70,180));
-    circlefill(tela, PLAY_X-3, PLAY_Y-3, 20, makecol(0,50,160));
+    circlefill(tela, PLAY_X, PLAY_Y, 23, cor);
+    circlefill(tela, PLAY_X-3, PLAY_Y-3, 20, cor2);
     triangle(tela, 320, 440, 332, 445, 320, 450, makecol(255,255,255));
     
     //repeat
-    circlefill(tela, REPEAT_X, REPEAT_Y, 18, makecol(20,70,180));
-    circlefill(tela, REPEAT_X-3, REPEAT_Y-3, 15, makecol(0,50,160));
+    circlefill(tela, REPEAT_X, REPEAT_Y, 18, cor);
+    circlefill(tela, REPEAT_X-3, REPEAT_Y-3, 15, cor2);
     rectfill(tela, REPEAT_X-8, REPEAT_Y-2, REPEAT_X+8, REPEAT_Y+1, makecol(255,255,255));
     triangle(tela, REPEAT_X+5, REPEAT_Y+5, REPEAT_X+10, REPEAT_Y, REPEAT_X+5, REPEAT_Y-5, makecol(255,255,255));
     
     //stop 
-    circlefill(tela, STOP_X, STOP_Y,18,makecol(20,70,180));
-    circlefill(tela, STOP_X-3, STOP_Y-3, 15, makecol(0,50,160));
+    circlefill(tela, STOP_X, STOP_Y,18,cor);
+    circlefill(tela, STOP_X-3, STOP_Y-3, 15, cor2);
     rectfill(tela, STOP_X-4, 440, STOP_X+4, 450, makecol(255,255,255));
 
     //backward 
-    circlefill(tela, BWARD_X, BWARD_Y, 18, makecol(20,70,180));
-    circlefill(tela, BWARD_X-3, BWARD_Y-3, 15, makecol(0,50,160));
+    circlefill(tela, BWARD_X, BWARD_Y, 18, cor);
+    circlefill(tela, BWARD_X-3, BWARD_Y-3, 15, cor2);
     triangle(tela, BWARD_X, 440, BWARD_X-10, 445, BWARD_X, 450, makecol(255,255,255));
     triangle(tela, BWARD_X+10, 440, BWARD_X, 445, BWARD_X+10, 450, makecol(255,255,255));
 
     //forward 
-    circlefill(tela, FWARD_X, FWARD_Y, 18, makecol(20,70,180));
-    circlefill(tela, FWARD_X-3, FWARD_Y-3, 15, makecol(0,50,160));
+    circlefill(tela, FWARD_X, FWARD_Y, 18, cor);
+    circlefill(tela, FWARD_X-3, FWARD_Y-3, 15, cor2);
     triangle(tela, FWARD_X, 440, FWARD_X+10, 445, FWARD_X, 450, makecol(255,255,255));
     triangle(tela, FWARD_X-10, 440, FWARD_X, 445, FWARD_X-10, 450, makecol(255,255,255));
     
     //mudo
-    circlefill(tela, MUTE_X, MUTE_Y, 15, makecol(20,70,180));
-    circlefill(tela, MUTE_X-3, MUTE_Y-3, 12, makecol(0,50,160));
+    circlefill(tela, MUTE_X, MUTE_Y, 15, cor);
+    circlefill(tela, MUTE_X-3, MUTE_Y-3, 12, cor2);
     int points[8] = {MUTE_X+8,MUTE_Y+8, MUTE_X+8,MUTE_Y-8, MUTE_X-4,MUTE_Y-4,  MUTE_X-4,MUTE_Y+4};
 	polygon(tela, 4, points, makecol(255, 255, 255));
     
     //volume
     rectfill(tela, VOL_X1, VOL_Y1, VOL_X2, VOL_Y2, makecol(255,255,255));
-    rectfill(tela, VOL_X1, VOL_Y1, VOL_X2-32, VOL_Y2, makecol(0,50,160));
+    rectfill(tela, VOL_X1, VOL_Y1, VOL_X2-32, VOL_Y2, cor2);
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(255,255,255),-1);
     textout_ex(tela, font, "Biblioteca", ABA_X1-90, 40, makecol(255,255,255),-1);
@@ -205,6 +213,15 @@ void Player::layout(){
     rectfill(tela, POS_X1, POS_Y1, POS_X2, POS_Y2, makecol(0,0,0));
 	
 	blit(tela, screen, 0, 0, 0, 0, 640, 480);     
+	
+	//imprime configurações na aba4
+	textout_ex(aba4, font, "Escolha a cor do programa", 20, 20, makecol(255,255,255),-1);
+	circlefill(aba4, COR_X1, COR_Y1, 20, RED);
+	circlefill(aba4, COR_X1-3, COR_Y1-3, 17, RED2);
+	circlefill(aba4, COR_X2, COR_Y2, 20, GREEN);
+	circlefill(aba4, COR_X2-3, COR_Y2-3, 17, GREEN2);
+	circlefill(aba4, COR_X3, COR_Y3, 20, BLUE);
+	circlefill(aba4, COR_X3-3, COR_Y3-3, 17, BLUE2);
 	
 	//imprime ajuda na aba5
     textout_ex(aba5, font, "Insira as musicas na pasta musicas", 5, 5, makecol(255,255,255),-1);
@@ -375,8 +392,8 @@ void Player::abas(){
 
 void Player::mute(){
 	FSOUND_SetMute(0, !FSOUND_GetMute(0));
-    circlefill(tela, MUTE_X, MUTE_Y, 15, makecol(20,70,180));
-    circlefill(tela, MUTE_X-3, MUTE_Y-3, 12, makecol(0,50,160));
+    circlefill(tela, MUTE_X, MUTE_Y, 15, cor);
+    circlefill(tela, MUTE_X-3, MUTE_Y-3, 12, cor2);
 	//cria um poligono
 	int points[8] = {MUTE_X+8,MUTE_Y+8, MUTE_X+8,MUTE_Y-8, MUTE_X-4,MUTE_Y-4,  MUTE_X-4,MUTE_Y+4};
 	polygon(tela, 4, points, makecol(255, 255, 255));
@@ -392,16 +409,6 @@ void Player::mouseesquerdo(){
     //abas
 	if(mouse_y <= 55 && mouse_y >= 35){
 		abas();
-	//se apertar a região de uma música
-	}else if (mouse_y >= ABA_Y1+20 && mouse_y <= (ABA_Y1+20+10*tot-2)){
-		//para a música antiga
-    	FSOUND_Stream_Stop(musica);
-    	//para o canal de áudio
-    	FSOUND_StopSound(0);
-	    //Esvazia o epaço alocado na memória
-		FSOUND_Stream_Close(musica);
-		num = int((mouse_y-ABA_Y1-20)/10);
-		backnext(true);
 	//seta posição da musica
 	}else if(mouse_y >= POS_Y1 && mouse_y <= POS_Y2 && mouse_x >= POS_X1 && mouse_x <= POS_X2){
 		int time = FSOUND_Stream_GetLengthMs(musica);
@@ -422,7 +429,7 @@ void Player::mouseesquerdo(){
         FSOUND_SetPaused(0, false);
         playpause();
         //imprime 0 seg/min
-        textprintf_ex(tela, font, 560, 391, makecol(255,255,255), makecol(20,70,180), "%d : %d%d", 0, 0, 0);
+        textprintf_ex(tela, font, 560, 391, makecol(255,255,255), cor, "%d : %d%d", 0, 0, 0);
     	rectfill(tela, POS_X1, POS_Y1, POS_X2, POS_Y2, makecol(0,0,0));
 	//ativa/desativa o modo mudo
     } else if ((distponto(mouse_x, mouse_y, MUTE_X, MUTE_Y)) <= 18){
@@ -450,10 +457,47 @@ void Player::mouseesquerdo(){
 		}
     //ajusta o volume
     } else if (mouse_x >= VOL_X1 && mouse_y >= VOL_Y1 && mouse_y <= VOL_Y2 && mouse_x <= VOL_X2){
-         FSOUND_SetVolumeAbsolute(0, (mouse_x-VOL_X1) * 4 + 1);
-         rectfill(tela, VOL_X1, VOL_Y1, VOL_X2, VOL_Y2, makecol(255,255,255));
-         rectfill(tela, VOL_X1, VOL_Y1, mouse_x, VOL_Y2, makecol(0,50,160));
-    }
+        FSOUND_SetVolumeAbsolute(0, (mouse_x-VOL_X1) * 4 + 1);
+        rectfill(tela, VOL_X1, VOL_Y1, VOL_X2, VOL_Y2, makecol(255,255,255));
+        rectfill(tela, VOL_X1, VOL_Y1, mouse_x, VOL_Y2, cor2);
+    //configura a cor
+	}else if(modo == CONFIG){
+		config();
+	} else {
+		//se apertar a região de uma música
+		if (mouse_y >= ABA_Y1+20 && mouse_y <= (ABA_Y1+20+10*tot-2)){
+			//para a música antiga
+    		FSOUND_Stream_Stop(musica);
+    		//para o canal de áudio
+    		FSOUND_StopSound(0);
+	    	//Esvazia o epaço alocado na memória
+			FSOUND_Stream_Close(musica);
+			num = int((mouse_y-ABA_Y1-20)/10);
+			backnext(true);
+		}
+	}
+}
+
+void Player::config(){
+	if((distponto(mouse_x, mouse_y, COR_X1, COR_Y1+ABA_Y1)) <= 20){
+		cor = RED;
+		cor2 = RED2;
+	} else if((distponto(mouse_x, mouse_y, COR_X2, COR_Y2+ABA_Y1)) <= 20){
+		cor = GREEN;
+		cor2 = GREEN2;
+	} else if((distponto(mouse_x, mouse_y, COR_X3, COR_Y3+ABA_Y1)) <= 20){
+		cor = BLUE;
+		cor2 = BLUE2;
+	}
+	layout();
+	int ms = FSOUND_Stream_GetLengthMs(musica);
+    //imprime o nome da música
+    char nome[MAX_NAME] = "";
+    strcat(nome, arquivo+9);
+	textprintf_ex(tela, font, 6, 401, makecol(255,255,255),-1, "%s", nome);
+    //imprime a duração da música
+    textprintf_ex(tela, font, 560, 401, makecol(255,255,255), -1, "%d : %d%d", ms/60000, ((ms/1000)%60)/10, (ms/1000)%10);
+	blit(tela, screen, 0, 0, 0, 0, MAX_X, MAX_Y);
 }
 
 void Player::backnext(bool next){
