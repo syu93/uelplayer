@@ -223,7 +223,7 @@ void Player::layout(){
 	blit(tela, screen, 0, 0, 0, 0, MAX_X, MAX_Y);
 	
 	//imprime configurações na aba4
-	textout_ex(aba4, font, "Escolha a cor do programa", 100, 20, makecol(255,255,255),-1);
+	textout_ex(aba4, font, "Escolha a cor do programa", 150, 20, makecol(255,255,255),-1);
 	circlefill(aba4, COR_X1, COR_Y1, 20, RED);
 	circlefill(aba4, COR_X1-3, COR_Y1-3, 17, RED2);
 	circlefill(aba4, COR_X2, COR_Y2, 20, GREEN);
@@ -234,7 +234,7 @@ void Player::layout(){
 	circlefill(aba4, COR_X4-3, COR_Y4-3, 17, GRAY2);
 	
 	//imprime ajuda na aba5
-    textout_ex(aba5, font, "Insira as musicas na pasta musicas", 15, 5, makecol(255,255,255),-1);
+    textout_ex(aba5, font, "Insira as musicas na pasta musicas (mp3/ wav/ wma)", 15, 5, makecol(255,255,255),-1);
     textout_ex(aba5, font, "Insira as letras na pasta letras", 15, 25, makecol(255,255,255),-1);
     textout_ex(aba5, font, "As letras devem ter o nome igual a musica (inclusive extensao)", 15, 45, makecol(255,255,255),-1);
     textout_ex(aba5, font, "Os manuais das bibliotecas utilizadas estao na pasta manuais", 15, 65, makecol(255,255,255),-1);
@@ -652,7 +652,7 @@ void init() {
 		exit(-1);
 	}
 
-    //funciona sem estar ativo
+    //funciona sem estar ativo (plano de fundo)
     set_display_switch_mode(SWITCH_BACKGROUND);
     
     //instala o timer, teclado e mouse
@@ -666,7 +666,7 @@ void init() {
     show_mouse(screen);
 }
 
-// limpa o buffer de teclado
+// limpa o buffer de teclado 
 void deinit() {
 	clear_keybuf();
 }

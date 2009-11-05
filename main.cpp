@@ -69,13 +69,14 @@ int main() {
 		player.atualiza();
 	}
     deinit();
-  	//Esvazia a memória utilizada
+    //Esvazia a memória utilizada
   	destroy_bitmap(player.tela);
   	destroy_bitmap(player.aba1);
   	destroy_bitmap(player.aba2);
   	destroy_bitmap(player.aba3);
   	destroy_bitmap(player.aba4);
   	destroy_bitmap(player.aba5);
+  	//Esvazia memória da música
   	FSOUND_Stream_Close(player.musica);
     //Fecha a API de áudio
   	FSOUND_Close();
