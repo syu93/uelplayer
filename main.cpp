@@ -29,7 +29,7 @@ int main() {
     //exibir a biblioteca
     player.imprimirbiblioteca();
     
-	//carrega a primeira música
+    //carrega a primeira música
     player.inicializar();
     
 	//desenha o layout da tela
@@ -75,7 +75,6 @@ int main() {
   	destroy_bitmap(player.aba2);
   	destroy_bitmap(player.aba3);
   	destroy_bitmap(player.aba4);
-  	destroy_bitmap(player.aba5);
   	//Esvazia memória da música
   	FSOUND_Stream_Close(player.musica);
     //Fecha a API de áudio

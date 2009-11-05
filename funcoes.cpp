@@ -7,12 +7,12 @@ typedef struct Player{
     DIR *dir;
     
     //arquivo utilizado pelo programa
-    FILE *bib, *let;
+    FILE *bib, *let, *play;
     
-    //número da música
+    //número da música 
     int num;
     
-    //total de músicas
+    //total de músicas 
     int tot;
     
     //modo
@@ -25,7 +25,7 @@ typedef struct Player{
     char arquivo[MAX_NAME];
     
     //bitmap para representar a tela
-    BITMAP *tela, *aba1, *aba2, *aba3, *aba4, *aba5;
+    BITMAP *tela, *aba1, *aba2, *aba3, *aba4;
     
     //clocks
     clock_t refresh, button, button2;
@@ -71,16 +71,14 @@ Player::Player(){
     aba2 = create_bitmap(MAX_X, ABA_Y);
     aba3 = create_bitmap(MAX_X, ABA_Y);
     aba4 = create_bitmap(MAX_X, ABA_Y);
-    aba5 = create_bitmap(MAX_X, ABA_Y);
-    
+        
 	//limpa os bitmaps
 	clear(tela);
 	clear(aba1);
 	clear(aba2);
 	clear(aba3);
 	clear(aba4);
-	clear(aba5);
-	
+		
 	//começa exibindo a biblioteca
 	modo = BIBLIOTECA;
 	
@@ -197,18 +195,16 @@ void Player::layout(){
     rectfill(tela, VOL_X1, VOL_Y1, VOL_X2-32, VOL_Y2, cor2);
     
     textout_ex(tela, font, "UEL PLAYER", 260, 10, makecol(255,255,255),-1);
-    textout_ex(tela, font, "Biblioteca", ABA_X1-90, 40, makecol(255,255,255),-1);
-    textout_ex(tela, font, "PlayList", ABA_X2-90, 40, makecol(255,255,255),-1);
-    textout_ex(tela, font, "Letra", ABA_X3-90, 40, makecol(255,255,255),-1);
-    textout_ex(tela, font, "Configuracoes", ABA_X4-110, 40, makecol(255,255,255),-1);
-    textout_ex(tela, font, "Ajuda", ABA_X4+50, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "Biblioteca", ABA_X1-110, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "Letra", ABA_X2-90, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "Configuracoes", ABA_X3-130, 40, makecol(255,255,255),-1);
+    textout_ex(tela, font, "Ajuda", ABA_X3+50, 40, makecol(255,255,255),-1);
     
     //linhas das abas
 	line(tela, ABA_X1, 35, ABA_X1, 55, makecol(255,255,255));
     line(tela, ABA_X2, 35, ABA_X2, 55, makecol(255,255,255));
     line(tela, ABA_X3, 35, ABA_X3, 55, makecol(255,255,255));
-    line(tela, ABA_X4, 35, ABA_X4, 55, makecol(255,255,255));
-            
+                
     //posição da música
     rectfill(tela, POS_X1, POS_Y1, POS_X2, POS_Y2, makecol(0,0,0));
     
@@ -222,29 +218,29 @@ void Player::layout(){
     textprintf_ex(tela, font, 560, 401, makecol(255,255,255), -1, "%d : %d%d", ms/60000, ((ms/1000)%60)/10, (ms/1000)%10);
 	blit(tela, screen, 0, 0, 0, 0, MAX_X, MAX_Y);
 	
-	//imprime configurações na aba4
-	textout_ex(aba4, font, "Escolha a cor do programa", 150, 20, makecol(255,255,255),-1);
-	circlefill(aba4, COR_X1, COR_Y1, 20, RED);
-	circlefill(aba4, COR_X1-3, COR_Y1-3, 17, RED2);
-	circlefill(aba4, COR_X2, COR_Y2, 20, GREEN);
-	circlefill(aba4, COR_X2-3, COR_Y2-3, 17, GREEN2);
-	circlefill(aba4, COR_X3, COR_Y3, 20, BLUE);
-	circlefill(aba4, COR_X3-3, COR_Y3-3, 17, BLUE2);
-	circlefill(aba4, COR_X4, COR_Y4, 20, GRAY);
-	circlefill(aba4, COR_X4-3, COR_Y4-3, 17, GRAY2);
+	//imprime configurações na aba3
+	textout_ex(aba3, font, "Escolha a cor do programa", 150, 20, makecol(255,255,255),-1);
+	circlefill(aba3, COR_X1, COR_Y1, 20, RED);
+	circlefill(aba3, COR_X1-3, COR_Y1-3, 17, RED2);
+	circlefill(aba3, COR_X2, COR_Y2, 20, GREEN);
+	circlefill(aba3, COR_X2-3, COR_Y2-3, 17, GREEN2);
+	circlefill(aba3, COR_X3, COR_Y3, 20, BLUE);
+	circlefill(aba3, COR_X3-3, COR_Y3-3, 17, BLUE2);
+	circlefill(aba3, COR_X4, COR_Y4, 20, GRAY);
+	circlefill(aba3, COR_X4-3, COR_Y4-3, 17, GRAY2);
 	
-	//imprime ajuda na aba5
-    textout_ex(aba5, font, "Insira as musicas na pasta musicas (mp3/ wav/ wma)", 15, 5, makecol(255,255,255),-1);
-    textout_ex(aba5, font, "Insira as letras na pasta letras", 15, 25, makecol(255,255,255),-1);
-    textout_ex(aba5, font, "As letras devem ter o nome igual a musica (inclusive extensao)", 15, 45, makecol(255,255,255),-1);
-    textout_ex(aba5, font, "Os manuais das bibliotecas utilizadas estao na pasta manuais", 15, 65, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Sobre:", 15, 105, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Breno Naodi Kusunoki", 15, 125, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Ernesto Yuiti Saito", 15, 145, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Marcos Okamura Rodrigues", 15, 165, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Robson Fumio Fujii", 15, 185, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Universidade Estadual de Londrina", 15, 225, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Ciencia da Computacao", 15, 245, makecol(255,255,255),-1);
+	//imprime ajuda na aba4
+    textout_ex(aba4, font, "Insira as musicas na pasta musicas (mp3/ wav/ wma)", 15, 5, makecol(255,255,255),-1);
+    textout_ex(aba4, font, "Insira as letras na pasta letras", 15, 25, makecol(255,255,255),-1);
+    textout_ex(aba4, font, "As letras devem ter o nome igual a musica (inclusive extensao)", 15, 45, makecol(255,255,255),-1);
+    textout_ex(aba4, font, "Os manuais das bibliotecas utilizadas estao na pasta manuais", 15, 65, makecol(255,255,255),-1);
+	textout_ex(aba4, font, "Sobre:", 15, 105, makecol(255,255,255),-1);
+	textout_ex(aba4, font, "Breno Naodi Kusunoki", 15, 125, makecol(255,255,255),-1);
+	textout_ex(aba4, font, "Ernesto Yuiti Saito", 15, 145, makecol(255,255,255),-1);
+	textout_ex(aba4, font, "Marcos Okamura Rodrigues", 15, 165, makecol(255,255,255),-1);
+	textout_ex(aba4, font, "Robson Fumio Fujii", 15, 185, makecol(255,255,255),-1);
+	textout_ex(aba4, font, "Universidade Estadual de Londrina", 15, 225, makecol(255,255,255),-1);
+	textout_ex(aba4, font, "Ciencia da Computacao", 15, 245, makecol(255,255,255),-1);
 }
 
 void Player::criarbiblioteca(){
@@ -279,6 +275,8 @@ void Player::criarbiblioteca(){
     //se não houver nenhuma música
     if(tot == 0){
 		allegro_message("Insira pelo menos uma musica na pasta musicas");
+		allegro_exit();
+		exit(1);
 	}
     //fecha o diretório 
     closedir(dir);
@@ -294,13 +292,13 @@ void Player::letras(){
 	strcat(nome, arquivo+9);
 	strcat(nome, ".txt\0");
 	let = fopen(nome, "r");    
-    clear(aba3);
+    clear(aba2);
 	if(let != NULL){
     	for(i = 1, j = 20; !feof(let); i += 8){
         	letra = fgetc(let);
         	//escreve uma linha
         	if(letra != '\n' && letra != -1){
-             	textprintf_ex(aba3, font, i, j, makecol(255,255,255), 0, "%c", letra);
+             	textprintf_ex(aba2, font, i, j, makecol(255,255,255), 0, "%c", letra);
         	//pula linha
         	} else {
             	//espaçamento entre linhas(2)
@@ -333,13 +331,14 @@ void Player::imprimirbiblioteca(){
             i = -7;
         }
     }
+    fclose(bib);
     //Desenha a biblioteca na aba 1 e cola na tela
     blit(aba1, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
 }
 
 void Player::passarmouse(){
     if(mouse_y >= ABA_Y1+20 && mouse_y <= (ABA_Y1+20+ 10*tot-3)){
-		if(modo == BIBLIOTECA){
+		if(modo == BIBLIOTECA ){
 			char nome[MAX_NAME];
 			int cont;
 			bib = fopen("data\\biblioteca.txt", "r");
@@ -357,7 +356,7 @@ void Player::passarmouse(){
         	fclose(bib);
     		//escreve o nome da música em amarelo
 			textout_ex(screen, font, nome, 0, mouse_y-mouse_y%10+1, makecol(255,255,0),0);
-		}   
+		} 
 	} else if((distponto(mouse_x, mouse_y, PLAY_X, PLAY_Y)) <= 25){
         if(FSOUND_GetPaused(0)){
             textout_ex(screen, font, "Play", mouse_x-8, mouse_y-8, makecol(255,255,255),0);  
@@ -391,10 +390,8 @@ void Player::abas(){
 	if(mouse_x <= ABA_X1){
 		modo = BIBLIOTECA;
 	} else if(mouse_x <= ABA_X2){
-		modo = PLAYLIST;
-	} else if(mouse_x <= ABA_X3){
 		modo = LETRA;
-	} else if(mouse_x <= ABA_X4){
+	} else if(mouse_x <= ABA_X3){
 		modo = CONFIG;
 	} else{
 		modo = AJUDA;
@@ -511,10 +508,11 @@ void Player::backnext(bool next){
     int i, j;
     char nome[MAX_NAME]; 
                         
-    //limpa a string com o nome do diretorio
+    
+	//limpa a string com o nome do diretorio
     strcpy(arquivo, "musicas\\\\");
     
-    bib = fopen("data\\biblioteca.txt", "r");
+	bib = fopen("data\\biblioteca.txt", "r");
     
     //avança
     if(next){
@@ -546,7 +544,8 @@ void Player::backnext(bool next){
             }
         }
     }
-        
+    fclose(bib);
+	        
     //concatena o nome do arquivo
     strcat(arquivo, nome); 
                     
@@ -610,17 +609,15 @@ void Player::atualiza(){
 		if(modo == BIBLIOTECA){
 			blit(aba1, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);		   
 		//playlist
-		}else if(modo == PLAYLIST){
-			blit(aba2, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
 		//letra
 		}else if(modo == LETRA){
-			blit(aba3, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
+			blit(aba2, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
 		//configurações
 		}else if(modo == CONFIG){
-			blit(aba4, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
+			blit(aba3, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
 		//ajuda
 		} else {
-			blit(aba5, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
+			blit(aba4, tela, 0, 0, 0, ABA_Y1, MAX_X, ABA_Y);
 		}
 		blit(tela, screen, 0, 0, 0, 0, MAX_X, MAX_Y);
 		release_screen();

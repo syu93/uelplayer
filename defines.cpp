@@ -12,10 +12,9 @@
 
 //modos
 #define BIBLIOTECA 	1
-#define PLAYLIST 	2
-#define LETRA 		3
-#define CONFIG 		4
-#define AJUDA 		5
+#define LETRA 		2
+#define CONFIG 		3
+#define AJUDA 		4
 
 //cores
 #define BLUE 		makecol(40,40,170)
@@ -31,10 +30,9 @@
 #define ABA_Y1 		61
 #define ABA_Y2 		380
 #define ABA_Y 		ABA_Y2-ABA_Y1
-#define ABA_X1		128
-#define ABA_X2		256	
-#define ABA_X3		384
-#define ABA_X4		512	
+#define ABA_X1		150
+#define ABA_X2		300	
+#define ABA_X3		450
 
 //botões
 #define REPEAT_X 	123
