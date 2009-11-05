@@ -86,7 +86,7 @@ Player::Player(){
 	
 	//cores
 	cor = BLUE;
-	cor2 = BLUE2;
+	cor2 = BLUE2;	 
 }
 
 //botão play/pause 
@@ -211,29 +211,40 @@ void Player::layout(){
             
     //posição da música
     rectfill(tela, POS_X1, POS_Y1, POS_X2, POS_Y2, makecol(0,0,0));
-	
-	blit(tela, screen, 0, 0, 0, 0, 640, 480);     
+    
+    //imprime o nome da música
+    int ms = FSOUND_Stream_GetLengthMs(musica);
+    //imprime o nome da música
+    char nome[MAX_NAME] = "";
+    strcat(nome, arquivo+9);
+	textprintf_ex(tela, font, 6, 401, makecol(255,255,255),-1, "%s", nome);
+    //imprime a duração da música
+    textprintf_ex(tela, font, 560, 401, makecol(255,255,255), -1, "%d : %d%d", ms/60000, ((ms/1000)%60)/10, (ms/1000)%10);
+	blit(tela, screen, 0, 0, 0, 0, MAX_X, MAX_Y);
 	
 	//imprime configurações na aba4
-	textout_ex(aba4, font, "Escolha a cor do programa", 20, 20, makecol(255,255,255),-1);
+	textout_ex(aba4, font, "Escolha a cor do programa", 100, 20, makecol(255,255,255),-1);
 	circlefill(aba4, COR_X1, COR_Y1, 20, RED);
 	circlefill(aba4, COR_X1-3, COR_Y1-3, 17, RED2);
 	circlefill(aba4, COR_X2, COR_Y2, 20, GREEN);
 	circlefill(aba4, COR_X2-3, COR_Y2-3, 17, GREEN2);
 	circlefill(aba4, COR_X3, COR_Y3, 20, BLUE);
 	circlefill(aba4, COR_X3-3, COR_Y3-3, 17, BLUE2);
+	circlefill(aba4, COR_X4, COR_Y4, 20, GRAY);
+	circlefill(aba4, COR_X4-3, COR_Y4-3, 17, GRAY2);
 	
 	//imprime ajuda na aba5
-    textout_ex(aba5, font, "Insira as musicas na pasta musicas", 5, 5, makecol(255,255,255),-1);
-    textout_ex(aba5, font, "Insira as letras na pasta letras", 5, 25, makecol(255,255,255),-1);
-    textout_ex(aba5, font, "Os manuais das bibliotecas utilizadas estao na pasta manuais", 5, 45, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Sobre:", 5, 85, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Breno Naodi Kusunoki", 5, 105, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Ernesto Yuiti Saito", 5, 125, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Marcos Okamura Rodrigues", 5, 145, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Robson Fumio Fujii", 5, 165, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Universidade Estadual de Londrina", 5, 205, makecol(255,255,255),-1);
-	textout_ex(aba5, font, "Ciencia da Computacao", 5, 225, makecol(255,255,255),-1);
+    textout_ex(aba5, font, "Insira as musicas na pasta musicas", 15, 5, makecol(255,255,255),-1);
+    textout_ex(aba5, font, "Insira as letras na pasta letras", 15, 25, makecol(255,255,255),-1);
+    textout_ex(aba5, font, "As letras devem ter o nome igual a musica (inclusive extensao)", 15, 45, makecol(255,255,255),-1);
+    textout_ex(aba5, font, "Os manuais das bibliotecas utilizadas estao na pasta manuais", 15, 65, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Sobre:", 15, 105, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Breno Naodi Kusunoki", 15, 125, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Ernesto Yuiti Saito", 15, 145, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Marcos Okamura Rodrigues", 15, 165, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Robson Fumio Fujii", 15, 185, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Universidade Estadual de Londrina", 15, 225, makecol(255,255,255),-1);
+	textout_ex(aba5, font, "Ciencia da Computacao", 15, 245, makecol(255,255,255),-1);
 }
 
 void Player::criarbiblioteca(){
@@ -488,16 +499,12 @@ void Player::config(){
 	} else if((distponto(mouse_x, mouse_y, COR_X3, COR_Y3+ABA_Y1)) <= 20){
 		cor = BLUE;
 		cor2 = BLUE2;
+	} else if((distponto(mouse_x, mouse_y, COR_X4, COR_Y4+ABA_Y1)) <= 20){
+		cor = GRAY;
+		cor2 = GRAY2;
 	}
+	//desenha o layout novamente
 	layout();
-	int ms = FSOUND_Stream_GetLengthMs(musica);
-    //imprime o nome da música
-    char nome[MAX_NAME] = "";
-    strcat(nome, arquivo+9);
-	textprintf_ex(tela, font, 6, 401, makecol(255,255,255),-1, "%s", nome);
-    //imprime a duração da música
-    textprintf_ex(tela, font, 560, 401, makecol(255,255,255), -1, "%d : %d%d", ms/60000, ((ms/1000)%60)/10, (ms/1000)%10);
-	blit(tela, screen, 0, 0, 0, 0, MAX_X, MAX_Y);
 }
 
 void Player::backnext(bool next){

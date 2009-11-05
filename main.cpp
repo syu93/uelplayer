@@ -26,16 +26,16 @@ int main() {
     //carrega a biblioteca
     player.criarbiblioteca();
     
-    //desenha o layout da tela
-    player.layout();
-    
     //exibir a biblioteca
     player.imprimirbiblioteca();
     
-    //carrega a primeira música
+	//carrega a primeira música
     player.inicializar();
     
-    // esc para sair do programa
+	//desenha o layout da tela
+    player.layout();
+    
+	// esc para sair do programa ou botão X
     while (!key[KEY_ESC] && !close_button_pressed){
         //se apertar o botão esquerdo do mouse
         if (mouse_b & 1){

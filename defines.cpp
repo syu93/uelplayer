@@ -24,15 +24,17 @@
 #define RED2		makecol(130,20,20)
 #define GREEN		makecol(40,130,40)
 #define GREEN2		makecol(20,110,20)
+#define GRAY		makecol(80,80,80)
+#define GRAY2		makecol(60,60,60)
 
 //abas
 #define ABA_Y1 		61
 #define ABA_Y2 		380
 #define ABA_Y 		ABA_Y2-ABA_Y1
-#define ABA_X1		120
-#define ABA_X2		240	
-#define ABA_X3		360
-#define ABA_X4		480	
+#define ABA_X1		128
+#define ABA_X2		256	
+#define ABA_X3		384
+#define ABA_X4		512	
 
 //botões
 #define REPEAT_X 	123
@@ -53,6 +55,8 @@
 #define COR_Y2		100
 #define COR_X3		300
 #define COR_Y3		100
+#define COR_X4		400
+#define COR_Y4		100
 
 //posição
 #define POS_X1		5
